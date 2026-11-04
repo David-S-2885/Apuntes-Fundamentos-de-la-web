@@ -1,0 +1,31 @@
+# Archivos auxiliares de compilación de LaTeX
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.glg
+*.glo
+*.gls
+*.idx
+*.ilg
+*.ind
+*.ist
+*.lof
+*.log
+*.lot
+*.nav
+*.out
+*.snm
+*.run.xml
+*.toc
+*.synctex.gz
+*.vrb
+
+# Archivos de SO o editor
+.DS_Store
+Thumbs.db
+
+# (Opcional) Si prefieres que el PDF final no se guarde en Git:
+# *.pdf
