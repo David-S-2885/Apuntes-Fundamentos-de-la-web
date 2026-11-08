@@ -1,0 +1,783 @@
+\chapter{Fundamentos de la Web, Arquitecturas y Formatos de Datos}
+\label{cap:tema1}
+
+\section{Historia de la Web y Principios de Red}
+
+Para entender el desarrollo web moderno como ingenieros de software, es imprescindible desmitificar su infraestructura subyacente. La Web no existe en el vacío: es una aplicación distribuida a escala planetaria construida sobre la red de redes, \textbf{Internet}.
+
+\subsection{Diferencia Fundamental: Internet vs. World Wide Web}
+
+Existe una confusión habitual en el público general que confunde ambos términos, pero en ingeniería informática representan capas conceptuales y temporales completamente diferenciadas:
+
+\begin{definicion}{Internet}
+\textbf{Internet} es la infraestructura física y lógica de telecomunicaciones descentralizada y global. Consiste en una gigantesca malla de redes interconectadas que utilizan la familia de protocolos \textbf{TCP/IP} para permitir que dispositivos de cualquier fabricante o arquitectura física intercambien paquetes binarios de datos. Nació a finales de los años 60 a partir del proyecto militar y académico estadounidense \textbf{ARPANET} (1969).
+\end{definicion}
+
+\begin{definicion}{World Wide Web (WWW)}
+La \textbf{World Wide Web} (comúnmente abreviada como la \textit{Web}) es un \textbf{sistema de información y distribución de documentos de hipertexto y multimedia interconectados} que funciona en la capa de aplicación sobre la infraestructura de Internet. Fue concebida más de dos décadas después de Internet, en 1989--1991.
+\end{definicion}
+
+En términos sencillos: Internet son las autopistas, raíles y túneles mundiales de comunicación; la Web es el servicio de trenes que transporta información hipermedia a través de esas vías. Otros servicios que viajan por las mismas autopistas de Internet de manera totalmente independiente a la Web son el correo electrónico (SMTP/IMAP), la transferencia de ficheros directa (FTP/SFTP), el acceso remoto seguro por terminal (SSH) o las llamadas de voz sobre IP (RTP/SIP).
+
+\subsection{Nacimiento de la Web: El CERN y los Primeros Estándares}
+
+En marzo de 1989, el físico británico \textbf{Tim Berners-Lee}, trabajando en el Centro Europeo para la Investigación Nuclear (\textbf{CERN}) en Suiza, redactó la propuesta titulada \textit{«Information Management: A Proposal»}. El CERN albergaba a miles de científicos de todo el mundo que utilizaban ordenadores heterogéneos y sistemas operativos incompatibles entre sí, lo que provocaba una enorme pérdida de tiempo y documentación al intentar compartir resultados.
+
+\begin{historia}{La Invención de los Tres Pilares de la Web (1990--1992)}
+Junto al ingeniero belga \textbf{Robert Cailliau}, Tim Berners-Lee presentó formalmente en 1990 la arquitectura de la Web, basada en tres invenciones revolucionarias que siguen vigentes en la actualidad:
+\begin{enumerate}
+  \item \textbf{URI/URL (Uniform Resource Identifier / Locator):} Un sistema unificado y universal de direccionamiento para localizar inequívocamente cualquier recurso de información en la red.
+  \item \textbf{HTTP (HyperText Transfer Protocol):} Un protocolo de red ligero y sin estado para que los clientes soliciten documentos y los servidores los entreguen.
+  \item \textbf{HTML (HyperText Markup Language):} Un lenguaje de marcado para estructurar textos y vincularlos entre sí mediante enlaces de hipertexto.
+\end{enumerate}
+En una estación de trabajo \textit{NeXTcube} desarrollada por Steve Jobs, Berners-Lee programó a finales de 1990 el primer servidor web de la historia (\texttt{httpd}) y el primer navegador-editor gráfico interactivo (\textit{WorldWideWeb}). En agosto de 1991, el proyecto se publicó a través de Internet para toda la comunidad científica mundial.
+\end{historia}
+
+Un hito trascendental para la historia de la humanidad ocurrió el 30 de abril de 1993: \textbf{el CERN liberó el código fuente de la Web y renunció a todos los derechos de propiedad intelectual, poniéndolo bajo dominio público}. Esta decisión desinteresada impidió la fragmentación propietaria de la tecnología y desató la mayor revolución informativa desde la imprenta de Gutenberg.
+
+\subsection{La Popularización y las Guerras de Navegadores}
+
+En 1993, Marc Andreessen y Eric Bina desarrollaron en el NCSA (Universidad de Illinois) el navegador \textbf{Mosaic}. Mosaic fue el primer navegador en ejecutarse en sistemas operativos masivos como Windows y Macintosh, e introdujo la capacidad histórica de incrustar imágenes directamente dentro del flujo de texto (etiqueta \texttt{<img>}), convirtiendo la Web en un medio visual y accesible para el público masivo.
+
+Poco después, Andreessen fundó \textbf{Netscape Communications}, lanzando \textit{Netscape Navigator} (1994), que dominó el 90\% del mercado en sus inicios. Viendo amenazada su hegemonía en el escritorio, Microsoft lanzó \textit{Internet Explorer} en 1995 integrado en Windows 95, desatando la llamada \textbf{Primera Guerra de Navegadores}. Durante este conflicto comercial, ambas compañías introdujeron extensiones propietarias al lenguaje HTML sin coordinarse, provocando que las páginas web se rompieran si no eran visitadas con el navegador específico para el que fueron diseñadas (el famoso cartel de \textit{«Optimizado para Internet Explorer a 800x600»}).
+
+\subsection{Los Organismos de Estandarización y el «Living Standard»}
+
+Para salvar a la Web del caos de la fragmentación y salvaguardar su interoperabilidad, Tim Berners-Lee fundó en octubre de 1994 el \textbf{World Wide Web Consortium (W3C)}. Desde entonces, la gobernanza de la Web se sustenta sobre varios organismos internacionales:
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{W3C (World Wide Web Consortium):} Organismo neutral que define las recomendaciones oficiales de tecnologías web fundamentales, como HTML (históricamente), XML, SVG y CSS.
+  \item \textbf{IETF (Internet Engineering Task Force):} Comunidad técnica internacional abierta que estandariza los protocolos base de Internet mediante documentos \textbf{RFC} (\textit{Request for Comments}), incluyendo IP, TCP, UDP y HTTP.
+  \item \textbf{ECMA International:} Organismo encargado de la estandarización del lenguaje JavaScript a través de la especificación \textbf{ECMAScript} (comité técnico TC39).
+  \item \textbf{WHATWG (Web Hypertext Application Technology Working Group):} Formado en 2004 por desarrolladores de Apple, Mozilla y Opera debido a la frustración con la lentitud del W3C y su intento de sustituir HTML por XHTML. El WHATWG impulsó \textbf{HTML5} y hoy mantiene la especificación como un \textit{Living Standard} (estándar vivo en continua evolución, sin números de versión fijos). En 2019, el W3C y el WHATWG firmaron un acuerdo histórico reconociendo al WHATWG como la autoridad única del estándar HTML y del DOM.
+\end{itemize}
+
+\subsection{La Trinidad del Front-End y su Cronología}
+
+La Web como plataforma interactiva se consolidó a través de tres tecnologías independientes que evolucionaron con una cadencia temporal precisa:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.95, every node/.style={transform shape}]
+  % Eje temporal
+  \draw[->, very thick, color=secondary] (0,0) -- (13,0) node[right, color=primary] {\textbf{Año}};
+  
+  % Puntos
+  \filldraw[primary] (1,0) circle (3pt) node[below=8pt] {\textbf{1990/93}};
+  \node[above=8pt, text width=2.8cm, align=center, fill=bglight, draw=primary, rounded corners=3pt] at (1,1.2) {\textbf{HTML}\\\small Estructura y Contenido\\(Berners-Lee / CERN)};
+  
+  \filldraw[accent] (6,0) circle (3pt) node[below=8pt] {\textbf{1995}};
+  \node[above=8pt, text width=2.8cm, align=center, fill=bglight, draw=accent, rounded corners=3pt] at (6,1.2) {\textbf{JavaScript}\\\small Interactividad y Lógica\\(Brendan Eich / Netscape)};
+  
+  \filldraw[secondary] (10.5,0) circle (3pt) node[below=8pt] {\textbf{1996}};
+  \node[above=8pt, text width=2.8cm, align=center, fill=bglight, draw=secondary, rounded corners=3pt] at (10.5,1.2) {\textbf{CSS}\\\small Presentación y Estilo\\(H. Wium Lie / W3C)};
+\end{tikzpicture}
+\caption{Cronología del nacimiento de los tres pilares del desarrollo Front-End.}
+\label{fig:trinidad-cronologia}
+\end{figure}
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{HTML (1990/1993):} Nació para marcar documentos científicos con hiperenlaces. No disponía de capacidades estéticas avanzadas ni de lógica de programación.
+  \item \textbf{JavaScript (1995):} Creado por Brendan Eich en Netscape en tan solo diez días (bajo el nombre clave \textit{Mocha}, luego renombrado a \textit{LiveScript} y finalmente a \textit{JavaScript} por razones comerciales aprovechando la popularidad de Java). Permitía dotar a las páginas de validaciones locales y pequeñas animaciones sin consultar al servidor.
+  \item \textbf{CSS (1996):} Creado por Håkon Wium Lie y Bert Bos bajo el auspicio del W3C para resolver un problema crítico: los documentos HTML se habían llenado de etiquetas visuales horribles (\texttt{<font>}, \texttt{<center>}, tablas anidadas) que mezclaban la presentación con el significado. CSS permitió la \textbf{separación radical entre contenido y diseño}.
+\end{itemize}
+\section{Arquitectura de Red y el Modelo Cliente-Servidor}
+
+El funcionamiento de toda aplicación web se sustenta sobre el paradigma de arquitectura distribuida denominado \textbf{Cliente-Servidor}.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw=primary, thick, fill=bglight, rounded corners=4pt, minimum width=2.8cm, minimum height=1.5cm, align=center},
+  arrow/.style={-{Stealth[scale=1.2]}, thick}
+]
+  \node[box] (client) {\textbf{Cliente Web}\\(Navegador / App)\\Ejecución esporádica};
+  \node[box, right=5cm of client] (server) {\textbf{Servidor Web}\\(Nginx / Apache / App)\\Escucha permanente};
+  
+  \draw[arrow, color=secondary] ($(client.east)+(0,0.4)$) -- node[above, text width=3.5cm, align=center] {\small\textbf{1. HTTP Request}\\\footnotesize (URL, Headers, Body)} ($(server.west)+(0,0.4)$);
+  \draw[arrow, color=accent] ($(server.west)-(0,0.4)$) -- node[below, text width=3.5cm, align=center] {\small\textbf{2. HTTP Response}\\\footnotesize (Status, Headers, HTML/JSON)} ($(client.east)-(0,0.4)$);
+\end{tikzpicture}
+\caption{Ciclo fundamental de Petición/Respuesta en el modelo Cliente-Servidor.}
+\label{fig:cliente-servidor-basico}
+\end{figure}
+
+\subsection{Características del Cliente y del Servidor}
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{El Dispositivo Servidor:} Es una máquina (física o virtual) conectada a la red de forma ininterrumpida que ejecuta un \textbf{software servidor}. Este software permanece en estado de escucha activa en un puerto de red esperando la llegada de peticiones externas.
+  \item \textbf{El Dispositivo Cliente:} Es el dispositivo final (ordenador personal, teléfono móvil, tableta, consola de videojuegos, dispositivo IoT) que ejecuta un \textbf{software cliente} (el navegador web como Google Chrome, Mozilla Firefox, Apple Safari, o una aplicación móvil). El cliente solo inicia la comunicación cuando requiere un recurso del servidor, emitiendo una petición puntual y cerrando o suspendiendo el canal tras recibir la respuesta.
+\end{itemize}
+
+\subsection{Direccionamiento IP, Nombres de Dominio y NAT}
+
+Para que dos máquinas puedan encontrarse en Internet, cada interfaz de red dispone de un identificador numérico único denominado \textbf{Dirección IP}:
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{IPv4:} Direcciones de 32 bits representadas en cuatro octetos decimales (ejemplo: \texttt{185.199.108.153}). El espacio teórico de aproximadamente $4.3 \times 10^9$ direcciones se encuentra agotado a nivel mundial.
+  \item \textbf{IPv6:} Direcciones de 128 bits expresadas en notación hexadecimal (ejemplo: \texttt{2001:0db8:85a3::8a2e:0370:7334}), con capacidad prácticamente inagotable ($3.4 \times 10^{38}$ direcciones).
+\end{itemize}
+
+Dado que los seres humanos memorizan palabras mejor que secuencias numéricas, la infraestructura de Internet incorpora el \textbf{DNS (Domain Name System)}: una base de datos jerárquica y distribuida a nivel mundial que traduce nombres de dominio legibles (como \texttt{www.google.es}) a su correspondiente dirección IP.
+
+\begin{importante}{La Realidad de las Direcciones IP: NAT (Network Address Translation)}
+En una visión teórica simplificada, se afirma que «cada dispositivo conectado a Internet tiene una dirección IP pública propia». Sin embargo, en la práctica de la ingeniería de redes, esto casi nunca es cierto para los clientes debido al mecanismo \textbf{NAT} (\textit{Network Address Translation}).\\
+Los routers domésticos y corporativos asignan a los ordenadores y móviles direcciones IP privadas (rangos reservados como \texttt{192.168.x.x} o \texttt{10.x.x.x}) no enrutables en Internet. Cuando el cliente hace una petición web, el router traduce la IP privada a la única dirección IP pública compartida por toda la red local. Esto protege a los clientes de ataques entrantes directos, pero refuerza el principio de que los clientes inician las conexiones y los servidores son quienes deben tener IPs públicas accesibles o nombres de dominio mapeados.
+\end{importante}
+
+\subsection{Puertos de Red y la Regla de Exclusión de Procesos}
+
+Un único servidor físico con una única dirección IP puede ejecutar simultáneamente múltiples servicios (por ejemplo, una página web, un servidor de correo y un servidor de bases de datos). Para dirigir el tráfico al proceso correcto en el sistema operativo, la capa de transporte utiliza el concepto de \textbf{Puerto de Red} (números enteros de 16 bits que abarcan de 0 a 65535):
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Puertos Conocidos (Well-Known Ports, 0--1023):} Reservados para protocolos estándar de Internet. Requieren privilegios de administrador en sistemas tipo UNIX para vincularse a ellos.
+  \item \textbf{Puertos Registrados (1024--49151):} Empleados por aplicaciones y servicios de usuario (por ejemplo, servidores de bases de datos o entornos de desarrollo).
+  \item \textbf{Puertos Dinámicos / Efímeros (49152--65535):} Asignados temporalmente por el sistema operativo a los clientes para recibir la respuesta a sus peticiones salientes.
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\caption{Protocolos de aplicación habituales sobre TCP/IP y sus puertos por defecto.}
+\label{tab:protocolos-puertos}
+\begin{tabularx}{\textwidth}{l p{2.2cm} l X}
+\toprule
+\textbf{Protocolo} & \textbf{Nombre Completo} & \textbf{Puerto} & \textbf{Propósito en la Ingeniería} \\
+\midrule
+\textbf{HTTP} & Hypertext Transfer Protocol & 80 / TCP & Comunicación web sin cifrar por defecto. \\
+\textbf{HTTPS} & HTTP Secure & 443 / TCP & Comunicación web cifrada con TLS/SSL. \\
+\textbf{SSH} & Secure Shell & 22 / TCP & Administración remota segura de servidores por terminal. \\
+\textbf{FTP} & File Transfer Protocol & 20, 21 / TCP & Transferencia clásica de ficheros (insegura en texto plano). \\
+\textbf{SMTP} & Simple Mail Transfer & 25, 587 / TCP & Envío y enrutamiento de correos electrónicos. \\
+\textbf{DNS} & Domain Name System & 53 / UDP, TCP & Resolución de nombres de dominio a direcciones IP. \\
+\textbf{RTP} & Real-time Transport Protocol & Dinámico / UDP & Transmisión en tiempo real de audio y vídeo en streaming. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\begin{importante}{Principio de Exclusión: El Error «Address Already in Use»}
+Un puerto de red en una misma interfaz e IP solo puede ser abierto y utilizado en modo escucha por \textbf{un único proceso servidor al mismo tiempo}. Si dos procesos intentan vincularse (\texttt{bind}) al mismo puerto e interfaz simultáneamente, el sistema operativo deniega la operación arrojando el clásico error de desarrollo:
+\begin{center}
+  \texttt{Error: listen EADDRINUSE: address already in use :::8080}
+\end{center}
+Si un servidor web decide no escuchar en el puerto por defecto (80 para HTTP o 443 para HTTPS), el cliente debe especificar explícitamente el puerto en la URL para poder comunicarse; por ejemplo: \texttt{http://localhost:8080/index.html}.
+\end{importante}
+\section{El Protocolo HTTP en Profundidad}
+
+El protocolo \textbf{HTTP} es el corazón de la Web. Se trata de un protocolo de la capa de aplicación cliente-servidor, sin estado (\textit{stateless}), basado en mensajes de texto plano (en HTTP/1.x) o tramas binarias multiplexadas (en HTTP/2 y HTTP/3).
+
+\subsection{Estructura Canónica de una URL}
+
+La \textbf{URL} (\textit{Uniform Resource Locator}) es la cadena de caracteres normalizada que identifica la ubicación exacta de un recurso en la red y el mecanismo para acceder a él. Su anatomía completa responde a la siguiente sintaxis:
+
+\begin{center}
+\texttt{\textcolor{primary}{https}://\textcolor{secondary}{usuario:password@}\textcolor{primary}{www.ejemplo.es}:\textcolor{accent}{8080}/\textcolor{strgreen}{articulos/tecnologia}?\textcolor{kwpurple}{categoria=web\&orden=desc}\#\textcolor{alertred}{seccion3}}
+\end{center}
+
+\begin{table}[htbp]
+\centering
+\caption{Desglose de los componentes de una URL.}
+\label{tab:componentes-url}
+\begin{tabularx}{\textwidth}{l l X}
+\toprule
+\textbf{Componente} & \textbf{Fragmento del ejemplo} & \textbf{Función y Consideraciones} \\
+\midrule
+\textbf{Esquema (Protocolo)} & \texttt{https} & Protocolo de comunicación a emplear (http, https, ftp). \\
+\textbf{Credenciales (Opcional)} & \texttt{usuario:password@} & Autenticación básica HTTP (desaconsejada en URL por seguridad). \\
+\textbf{Nombre de Host / Dominio} & \texttt{www.ejemplo.es} & Nombre FQDN o dirección IP del servidor destino. \\
+\textbf{Puerto (Opcional)} & \texttt{:8080} & Puerto TCP. Si se omite, se asume el puerto estándar (80 u 443). \\
+\textbf{Ruta (Path)} & \texttt{/articulos/tecnologia} & Jerarquía del recurso dentro del espacio lógico del servidor. \\
+\textbf{Query String (Consulta)} & \texttt{?categoria=web...} & Pares clave-valor precedidos por \texttt{?} y separados por \texttt{\&}. \\
+\textbf{Fragmento (Hash)} & \texttt{\#seccion3} & Identificador procesado solo en el cliente (no se envía al servidor). \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Anatomía de los Mensajes HTTP: Peticiones y Respuestas}
+
+Toda interacción web consiste en un mensaje de petición emitido por el cliente y un mensaje de respuesta devuelto por el servidor.
+
+\subsubsection{Formato de una Petición HTTP (Request)}
+Consta de tres partes obligatorias:
+\begin{enumerate}
+  \item \textbf{Línea de Petición (Request Line):} Método HTTP, la ruta del recurso solicitado y la versión del protocolo.
+  \item \textbf{Cabeceras de Petición (Request Headers):} Pares clave-valor que proporcionan metadatos sobre el cliente, formatos aceptados, cookies de sesión, etc.
+  \item \textbf{Línea en blanco obligatoria (CRLF):} Separa las cabeceras del cuerpo.
+  \item \textbf{Cuerpo del mensaje (Body - Opcional):} Presente habitualmente en métodos como \texttt{POST}, \texttt{PUT} o \texttt{PATCH} para enviar datos (formularios, JSON, ficheros).
+\end{enumerate}
+
+\begin{lstlisting}[language=bash, caption={Ejemplo real de una petición HTTP POST enviando credenciales.}]
+POST /api/v1/login HTTP/1.1
+Host: api.empresa.com
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+Content-Type: application/json
+Content-Length: 52
+Accept: application/json
+
+{"username": "david_s", "password": "SuperSecretPassword123"}
+\end{lstlisting}
+
+\subsubsection{Formato de una Respuesta HTTP (Response)}
+\begin{enumerate}
+  \item \textbf{Línea de Estado (Status Line):} Versión del protocolo, el código numérico de estado y un texto descriptivo (\textit{reason phrase}).
+  \item \textbf{Cabeceras de Respuesta (Response Headers):} Metadatos del servidor, tipo MIME del contenido devuelto, longitud, directivas de caché, etc.
+  \item \textbf{Línea en blanco (CRLF).}
+  \item \textbf{Cuerpo del mensaje (Body):} Los datos solicitados (HTML, imagen, JSON, etc.).
+\end{enumerate}
+
+\begin{lstlisting}[language=bash, caption={Ejemplo real de respuesta HTTP exitosa (200 OK) con payload JSON.}]
+HTTP/1.1 200 OK
+Date: Sun, 08 Nov 2026 18:00:00 GMT
+Server: nginx/1.24.0
+Content-Type: application/json; charset=UTF-8
+Content-Length: 78
+Set-Cookie: sessionId=abc987xyz; Path=/; HttpOnly; Secure
+
+{"status": "authenticated", "userId": 4402, "token": "eyJhbGciOiJIUzI1NiIs..."}
+\end{lstlisting}
+
+\subsection{Métodos HTTP Semánticos e Idempotencia}
+
+En el estándar HTTP, los métodos representan las intenciones semánticas del cliente sobre el recurso. En ingeniería de software, dos propiedades formales rigen estos métodos:
+
+\begin{definicion}{Método Seguro (Safe Method)}
+Un método es \textbf{seguro} si su invocación no provoca ninguna modificación en el estado del servidor (es de solo lectura). No tiene efectos colaterales observables.
+\end{definicion}
+
+\begin{definicion}{Método Idempotente (Idempotent Method)}
+Un método es \textbf{idempotente} si ejecutar la misma petición múltiples veces consecutivas produce exactamente el mismo resultado y deja al sistema en el mismo estado que ejecutarla una sola vez ($f(f(x)) = f(x)$). Si una petición de red se interrumpe por fallo de conexión, el cliente puede reenviarla con seguridad si el método es idempotente.
+\end{definicion}
+
+\begin{table}[htbp]
+\centering
+\caption{Clasificación formal de los métodos HTTP principales.}
+\label{tab:metodos-http}
+\begin{tabularx}{\textwidth}{l X c c}
+\toprule
+\textbf{Método} & \textbf{Propósito Semántico en la Web} & \textbf{¿Seguro?} & \textbf{¿Idempotente?} \\
+\midrule
+\textbf{GET} & Recuperar la representación de un recurso existente. & \textbf{Sí} & \textbf{Sí} \\
+\textbf{HEAD} & Igual que GET, pero devuelve únicamente las cabeceras sin cuerpo. & \textbf{Sí} & \textbf{Sí} \\
+\textbf{POST} & Procesar datos o crear un nuevo recurso subordinado. & No & No \\
+\textbf{PUT} & Reemplazar por completo el recurso indicado (o crearlo si no existe). & No & \textbf{Sí} \\
+\textbf{PATCH} & Modificar parcialmente un recurso existente. & No & No \\
+\textbf{DELETE} & Eliminar permanentemente el recurso especificado. & No & \textbf{Sí} \\
+\textbf{OPTIONS} & Consultar los métodos de comunicación permitidos por el servidor. & \textbf{Sí} & \textbf{Sí} \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+\subsection{Familias de Códigos de Estado HTTP}
+
+Los códigos numéricos de respuesta de tres dígitos se agrupan en cinco familias según su primer dígito:
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{1xx -- Informativos:} Petición recibida y en proceso (ej. \texttt{101 Switching Protocols} para WebSockets).
+  \item \textbf{2xx -- Respuestas Exitosas:}
+    \begin{itemize}
+      \item \texttt{200 OK}: Petición procesada con éxito y recurso devuelto en el cuerpo.
+      \item \texttt{201 Created}: Recurso creado exitosamente (habitual tras un \texttt{POST}). La cabecera \texttt{Location} suele indicar su nueva URL.
+      \item \texttt{204 No Content}: Petición procesada con éxito pero la respuesta intencionadamente no incluye cuerpo (común en peticiones \texttt{DELETE}).
+    \end{itemize}
+  \item \textbf{3xx -- Redirecciones:} Se requiere una acción adicional del cliente:
+    \begin{itemize}
+      \item \texttt{301 Moved Permanently}: El recurso cambió de URL para siempre (actualiza los índices de buscadores SEO).
+      \item \texttt{302 Found} / \texttt{307 Temporary Redirect}: Redirección temporal.
+      \item \texttt{304 Not Modified}: El recurso no ha cambiado desde la última visita en caché del cliente; no se envía cuerpo para ahorrar ancho de banda.
+    \end{itemize}
+  \item \textbf{4xx -- Errores de Cliente:} La petición contiene sintaxis errónea o no puede procesarse:
+    \begin{itemize}
+      \item \texttt{400 Bad Request}: Petición mal formada o datos JSON inválidos.
+      \item \texttt{401 Unauthorized}: Autenticación requerida; faltan credenciales o el token ha expirado.
+      \item \texttt{403 Forbidden}: El servidor reconoce al usuario pero este no posee permisos suficientes para acceder al recurso.
+      \item \texttt{404 Not Found}: El recurso solicitado no existe en la ruta especificada.
+      \item \texttt{405 Method Not Allowed}: El recurso existe pero no admite el método utilizado (ej. intentar un \texttt{POST} en una ruta de solo lectura).
+    \end{itemize}
+  \item \textbf{5xx -- Errores de Servidor:} El servidor falló al intentar atender una petición válida:
+    \begin{itemize}
+      \item \texttt{500 Internal Server Error}: Excepción no controlada o fallo genérico en el código backend.
+      \item \texttt{502 Bad Gateway}: Un proxy inverso o balanceador recibió una respuesta inválida del servidor interno.
+      \item \texttt{503 Service Unavailable}: Servidor temporalmente sobrecargado o en mantenimiento.
+      \item \texttt{504 Gateway Timeout}: El servidor interno de aplicación tardó demasiado tiempo en responder al proxy inverso.
+    \end{itemize}
+\end{itemize}
+
+\subsection{El Dilema del Estado: Cookies, Sesiones y Tokens JWT}
+
+HTTP fue concebido como un protocolo \textbf{sin estado (stateless)}: cada petición se procesa de forma completamente aislada e independiente, sin que el servidor recuerde ninguna interacción previa del mismo cliente. Sin embargo, aplicaciones como carritos de la compra o portales bancarios requieren recordar la identidad del usuario a lo largo de múltiples páginas.
+
+Para solucionar esta limitación surgieron dos estrategias arquitectónicas esenciales:
+\begin{enumerate}
+  \item \textbf{Sesiones Basadas en Cookies (Stateful):} Al autenticarse, el servidor genera un identificador aleatorio de sesión (\textit{Session ID}) guardado en la memoria o base de datos del servidor (ej. Redis), y lo envía al cliente mediante la cabecera \texttt{Set-Cookie: session\_id=xyz; HttpOnly; Secure}. El navegador almacena la cookie y la adjunta automáticamente en todas las peticiones posteriores. El servidor busca el ID y recupera los datos del usuario.
+  \item \textbf{Tokens Autocontenidos / JWT (Stateless Authentication):} El servidor firma criptográficamente un token (\textbf{JSON Web Token}) que contiene la identidad y los roles del usuario. El cliente almacena el token y lo envía explícitamente en la cabecera \texttt{Authorization: Bearer <token>}. El servidor no necesita almacenar sesiones en memoria: valida la firma criptográfica con su clave secreta y confía en la información contenida en el token.
+\end{enumerate}
+\section{Evolución del Servidor Web y Tecnologías Backend}
+
+\subsection{Servidores Web Estáticos (1990--1993)}
+
+En los primeros años de la Web, los servidores (como \textbf{NCSA HTTPd}, el posterior \textbf{Apache HTTP Server} o \textbf{Microsoft IIS}) eran extremadamente simples: actuaban como despachadores de archivos físicos del disco duro. 
+Cuando llegaba una petición para \texttt{/documentos/guia.html}, el servidor web buscaba en su directorio raíz (\textit{DocumentRoot}) la ruta local \texttt{/var/www/html/documentos/guia.html}, leía el fichero byte a byte y lo enviaba en el cuerpo de la respuesta HTTP con el \texttt{Content-Type: text/html}.
+
+\subsection{El Nacimiento de la Web Dinámica: CGI (Common Gateway Interface)}
+
+En 1993 nació la necesidad de presentar información variable (como el tiempo meteorológico, cotizaciones bursátiles o un simple contador de visitas). Para ello se creó la especificación \textbf{CGI (Common Gateway Interface)}: un estándar que permitía al servidor web delegar la generación del HTML a un programa externo ejecutable escrito en lenguajes como C, Perl o scripts de Shell.
+
+\begin{importante}{La Ineficiencia de CGI y el Desafío C10K}
+En el modelo CGI tradicional, \textbf{por cada petición HTTP entrante, el servidor web debía crear un proceso completamente nuevo en el sistema operativo} (\textit{fork-and-exec}) para ejecutar el script, pasarle los parámetros por variables de entorno y leer su salida estándar (\texttt{stdout}).\\
+Bajo cargas de trabajo reales con cientos o miles de usuarios simultáneos, el coste computacional y de memoria de instanciar tantos procesos colapsaba los servidores (problema de escalabilidad). Esto motivó la creación de módulos persistentes integrados en el propio servidor web (como \texttt{mod\_perl}, \texttt{mod\_php} o servidores de aplicaciones Java con hilos de ejecución persistentes).
+\end{importante}
+
+\subsection{El Ecosistema Backend Moderno y las Bases de Datos}
+
+Hoy en día, las aplicaciones web no sirven páginas estáticas de disco, sino que ejecutan servidores de aplicación altamente optimizados que reciben la URL, ejecutan lógica de negocio, consultan bases de datos y generan las respuestas al vuelo:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw=primary, thick, fill=bglight, rounded corners=4pt, minimum width=2.4cm, minimum height=1.3cm, align=center},
+  arrow/.style={-{Stealth[scale=1.1]}, thick}
+]
+  \node[box] (browser) {\textbf{Navegador}\\\small(Cliente Web)};
+  \node[box, right=2.8cm of browser] (server) {\textbf{Servidor Web}\\\small(Lógica Backend)};
+  \node[box, right=2.8cm of server] (db) {\textbf{Base de Datos}\\\small(SQL / NoSQL)};
+
+  \draw[arrow, color=primary] ($(browser.east)+(0,0.3)$) -- node[above] {\small 1. URL / Request} ($(server.west)+(0,0.3)$);
+  \draw[arrow, color=accent] ($(server.east)+(0,0.3)$) -- node[above] {\small 2. Consulta SQL} ($(db.west)+(0,0.3)$);
+  \draw[arrow, color=accent] ($(db.west)-(0,0.3)$) -- node[below] {\small 3. Datos devueltos} ($(server.east)-(0,0.3)$);
+  \draw[arrow, color=secondary] ($(server.west)-(0,0.3)$) -- node[below] {\small 4. HTML / JSON} ($(browser.east)-(0,0.3)$);
+\end{tikzpicture}
+\caption{Flujo de datos en una aplicación web dinámica con base de datos.}
+\label{fig:arquitectura-tres-capas}
+\end{figure}
+
+Entre los principales lenguajes y plataformas backend destacan:
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Java / Kotlin:} Dominante en entornos bancarios y corporativos gracias a frameworks como \textbf{Spring Boot} y Jakarta EE. Gran robustez tipada, multihilo y rendimiento con la JVM.
+  \item \textbf{JavaScript / TypeScript sobre Node.js o Deno:} Permite utilizar el mismo lenguaje tanto en cliente como en servidor. Se basa en el motor V8 de Google y una arquitectura asíncrona no bloqueante basada en un bucle de eventos (\textit{Event Loop}). Frameworks: Express, NestJS, Fastify.
+  \item \textbf{Python:} Muy popular por su sintaxis limpia y rapidez de desarrollo. Frameworks: \textbf{Django} (arquitectura completa con ORM y panel de administración), \textbf{Flask} y \textbf{FastAPI} (asíncrono de alto rendimiento para APIs).
+  \item \textbf{PHP:} El lenguaje que impulsó la web dinámica clásica (usado históricamente por Facebook, Wikipedia y WordPress). Hoy en día cuenta con frameworks de nivel empresarial como \textbf{Laravel} y \textbf{Symfony}.
+  \item \textbf{C\# (.NET Core):} Plataforma moderna de alto rendimiento y código abierto desarrollada por Microsoft.
+  \item \textbf{Go (Golang):} Desarrollado por Google, destaca por su velocidad de compilación nativa a binario único y su modelo de concurrencia ligera mediante \textit{goroutines}.
+\end{itemize}
+
+En la capa de persistencia, los ingenieros seleccionan entre dos grandes familias:
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Bases de Datos Relacionales (SQL):} PostgreSQL, MySQL, MariaDB, Oracle, Microsoft SQL Server. Estructuran la información en tablas con esquemas estrictos, relaciones mediante claves foráneas y garantías formales \textbf{ACID} (Atomicidad, Consistencia, Aislamiento y Durabilidad).
+  \item \textbf{Bases de Datos NoSQL:} Diseñadas para alta escalabilidad horizontal y esquemas flexibles:
+    \begin{itemize}
+      \item \textit{Documentales:} MongoDB, CouchDB (almacenan documentos JSON/BSON).
+      \item \textit{Clave-Valor:} Redis, Memcached (cachés en memoria de latencia sub-milisegundo).
+      \item \textit{Columnar / Familias de Columnas:} Apache Cassandra, ScyllaDB (análisis masivo distribuido).
+      \item \textit{Grafos:} Neo4j (relaciones complejas como redes sociales o detección de fraudes).
+    \end{itemize}
+\end{itemize}
+\section{Taxonomía y Arquitecturas de las Aplicaciones Web}
+
+Uno de los aportes teóricos y prácticos más importantes de la materia es la clasificación de los sitios y aplicaciones web en función de cómo combinan las capacidades del cliente y del servidor.
+
+\subsection{La Matriz Arquitectónica \texorpdfstring{$2\times 2$}{2x2}}
+
+Todo desarrollo web se sitúa en la intersección de dos ejes:
+\begin{enumerate}
+  \item \textbf{El Servidor:} ¿Es \textbf{Estático} (solo despacha archivos preexistentes del disco/CDN) o \textbf{Dinámico} (ejecuta código que genera respuestas en tiempo real mediante lógica y bases de datos)?
+  \item \textbf{El Cliente:} ¿Es \textbf{Estático} (solo renderiza HTML y CSS, o navega mediante recargas completas sin JS) o \textbf{Dinámico} (ejecuta JavaScript en el navegador del usuario para manipular la interfaz o solicitar datos en segundo plano)?
+\end{enumerate}
+
+De esta matriz surgen las \textbf{seis arquitecturas web fundamentales}:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=1.2cm and 2.5cm,
+  header/.style={draw=primary, fill=primary!15, thick, rounded corners, minimum width=5.5cm, minimum height=1cm, align=center, font=\bfseries},
+  leaf/.style={draw=secondary, fill=bglight, thick, rounded corners, minimum width=5.5cm, minimum height=1.1cm, align=center, font=\small}
+]
+  \node[header] (serv_est) {\textbf{Servidor Estático}\\(Páginas Web)};
+  \node[header, right=of serv_est] (serv_din) {\textbf{Servidor Dinámico}\\(Aplicaciones Web)};
+
+  \node[leaf, below=0.8cm of serv_est] (p1) {1. Página web estática\\(Solo HTML + CSS)};
+  \node[leaf, below=0.8cm of p1] (p2) {2. Página web interactiva\\(HTML + CSS + JavaScript)};
+
+  \node[leaf, below=0.8cm of serv_din] (a1) {3. Aplicación web con cliente estático\\(SSR clásico sin JavaScript)};
+  \node[leaf, below=0.8cm of a1] (a2) {4. Aplicación web interactiva\\(SSR + JS para efectos/validaciones)};
+  \node[leaf, below=0.8cm of a2] (a3) {5. Aplicación web con AJAX\\(Carga parcial en segundo plano)};
+  \node[leaf, below=0.8cm of a3] (a4) {6. Aplicación web SPA\\(Single Page Application con API REST)};
+
+  \draw[thick, primary, -{Stealth}] (serv_est) -- (p1);
+  \draw[thick, primary, -{Stealth}] (p1) -- (p2);
+
+  \draw[thick, secondary, -{Stealth}] (serv_din) -- (a1);
+  \draw[thick, secondary, -{Stealth}] (a1) -- (a2);
+  \draw[thick, secondary, -{Stealth}] (a2) -- (a3);
+  \draw[thick, secondary, -{Stealth}] (a3) -- (a4);
+\end{tikzpicture}
+\caption{Taxonomía de las seis arquitecturas web del programa de la asignatura.}
+\label{fig:taxonomia-arquitecturas}
+\end{figure}
+
+\subsection{Análisis Detallado de las 6 Arquitecturas}
+
+\subsubsection{1. Página Web Estática}
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Mecanismo Técnico:} El cliente solicita una URL por HTTP. El servidor busca el archivo HTML/CSS en disco y lo devuelve intacto. El navegador visualiza la página sin ejecutar código JavaScript. Al pulsar cualquier enlace, el navegador descarga un nuevo archivo HTML y repinta la pantalla completa desde cero.
+  \item \textbf{Tecnologías:} HTML y CSS puro (o maquetado mediante frameworks CSS como Bootstrap).
+  \item \textbf{Ventajas:} Consumo de recursos ínfimo en servidor, rendimiento extremo de entrega a través de redes CDN (\textit{Content Delivery Networks}), coste económico prácticamente nulo (servicios gratuitos como GitHub Pages, Netlify o Vercel) y superficie de ataque de seguridad casi inexistente (no hay inyección SQL ni código vulnerable en servidor).
+  \item \textbf{Desventajas:} Contenido idéntico para todos los usuarios. No permite gestión de sesiones, usuarios ni persistencia de datos. Su actualización requiere editar ficheros y desplegar por Git o SSH.
+\end{itemize}
+
+\subsubsection{2. Página Web Interactiva}
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Mecanismo Técnico:} El contenido continúa alojado estáticamente en el disco duro del servidor web, pero los archivos HTML enlazan scripts de JavaScript que se ejecutan en el navegador del cliente.
+  \item \textbf{Objetivo del JavaScript:} Proporcionar interactividad visual y utilidades en el cliente: animaciones complejas, galerías de imágenes (\textit{carousels}), menús desplegables, acordeones que muestran u ocultan texto para facilitar la lectura de documentos extensos, o calculadoras que operan puramente en local.
+  \item \textbf{Ventajas e Inconvenientes:} Mantiene la simplicidad y el coste cero de alojamiento en servidor estático, pero enriquece notablemente la experiencia de usuario. Su límite radica en que no puede almacenar datos persistentes en un servidor central.
+\end{itemize}
+
+\subsubsection{3. Aplicación Web con Cliente Estático (SSR Clásico Puro)}
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Mecanismo Técnico:} El servidor es dinámico (ejecuta PHP, Java, Python, Node.js) y se conecta a una base de datos para generar el documento HTML en tiempo real ante cada petición (\textit{Server-Side Rendering}). Sin embargo, \textbf{el cliente no ejecuta ningún código JavaScript}. Las interacciones del usuario se limitan a hiperenlaces ordinarios y formularios que emiten peticiones \texttt{GET} o \texttt{POST}. Cada clic provoca la recarga absoluta de la página en el navegador.
+  \item \textbf{Ejemplo Emblemático:} La versión básica HTML de \textbf{Gmail} (mantenida por Google para dispositivos con conexiones ultra-lentas hasta su descontinuación a principios de 2024).
+  \item \textbf{Ventajas:} Funciona de forma garantizada en navegadores antiguos o con JavaScript deshabilitado por seguridad; accesibilidad absoluta y consumo mínimo de CPU y batería en el dispositivo cliente.
+  \item \textbf{Desventajas:} Pésima experiencia de usuario (navegación tosca con parpadeo blanco constante en pantalla al recargar la página completa, incluso cuando el 95\% del contenido no ha variado).
+\end{itemize}
+
+\subsubsection{4. Aplicación Web Interactiva (SSR con JavaScript Progresivo)}
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Mecanismo Técnico:} Es la arquitectura predominante de la Web tradicional empresarial. El servidor genera las páginas dinámicamente mediante plantillas en servidor (JSP, Thymeleaf, Blade, Django Templates), pero la página resultante incluye JavaScript para:
+    \begin{itemize}
+      \item Validar formularios en el cliente antes de enviarlos (evitando esperar al servidor para avisar de contraseñas cortas o formatos de email erróneos).
+      \item Añadir efectos visuales avanzados, modales emergentes y componentes dinámicos.
+    \end{itemize}
+  \item \textbf{Ventajas:} Excelente equilibrio entre SEO sólido (los motores de búsqueda indexan HTML completo devuelto por el servidor) y buena experiencia de usuario interactiva.
+\end{itemize}
+
+\subsubsection{5. Aplicación Web con AJAX (Carga Asíncrona Parcial)}
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{¿Qué es AJAX?:} Acrónimo de \textbf{Asynchronous JavaScript And XML} (término acuñado por Jesse James Garrett en 2005). Es una técnica de ingeniería que permite al código JavaScript del navegador realizar peticiones HTTP al servidor web en segundo plano, sin interferir con la página visible ni recargarla.
+  \item \textbf{Mecanismo Técnico:} Cuando llega la respuesta del servidor en segundo plano, el código JavaScript captura los datos y manipula quirúrgicamente el DOM (\textit{Document Object Model}) para actualizar únicamente la sección de la pantalla que ha cambiado.
+  \item \textbf{¿Qué devuelve el servidor ante una petición AJAX?:}
+    \begin{itemize}
+      \item \textit{Fragmentos de HTML:} El servidor devuelve solo el bloque HTML que cambió (ejemplo: tres nuevos comentarios) y JavaScript los inserta directamente mediante \texttt{innerHTML} o \texttt{append()}.
+      \item \textit{Información Estructurada (JSON):} El servidor devuelve datos puros en formato JSON a través de una API REST. JavaScript interpreta el objeto y construye dinámicamente los elementos visuales.
+    \end{itemize}
+  \item \textbf{Casos de Uso Revolucionarios:}
+    \begin{itemize}
+      \item \textbf{Autocompletado / Google Suggest:} Al teclear una letra, se pide en segundo plano una lista de sugerencias sin recargar la página.
+      \item \textbf{Scroll Infinito:} En plataformas como Twitter/X o Google Imágenes, al aproximarse el usuario al final de la pantalla, JavaScript pide los siguientes 20 elementos y los concatena fluidamente, eliminando los botones de paginación tradicionales.
+      \item \textbf{Validación de Disponibilidad:} Comprobación en vivo de si un nombre de usuario ya está registrado en el momento en que se escribe en el campo del formulario.
+    \end{itemize}
+\end{itemize}
+
+\subsubsection{6. Aplicación Web SPA (Single Page Application)}
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Filosofía Arquitectónica:} La técnica AJAX llevada a su máxima expresión. El servidor web entrega al inicio un único archivo \texttt{index.html} casi vacío junto a una hoja de estilos y un paquete pesado de JavaScript (\textit{bundle}). A partir de ese instante, \textbf{la página nunca más se vuelve a recargar}.
+  \item \textbf{Client-Side Rendering (CSR):} Cuando el usuario hace clic para cambiar de sección (por ejemplo, de "Perfil" a "Configuración"), el navegador no pide un nuevo HTML: el enrutador de JavaScript (\textit{Client-Side Router}) intercepta la URL mediante la \textit{History API} del navegador, desmonta los componentes visuales antiguos de la pantalla, solicita datos en formato JSON a una \textbf{API REST} del servidor y monta los nuevos componentes en milisegundos.
+  \item \textbf{Ejemplos Reales:} Google Maps, WhatsApp Web, Gmail moderno, GitHub, Spotify Web.
+  \item \textbf{Frameworks Líderes:} React (Meta), Angular (Google), Vue.js (Evan You) y Svelte.
+  \item \textbf{Ventajas:} Experiencia de usuario ultra-fluida idéntica a una aplicación nativa de escritorio; total desacoplamiento entre el equipo de Front-End (interfaz) y Back-End (lógica de negocio y API REST reusable para aplicaciones móviles).
+  \item \textbf{Desventajas e Ingeniería Avanzada:} Mayor complejidad de desarrollo, tiempo de carga inicial lento (*Initial Page Load* debido al tamaño del bundle JS) y dificultades de posicionamiento en motores de búsqueda (SEO), ya que los rastreadores web tradicionales leen el HTML inicial vacío. Para solucionar esto, la industria moderna recurre a arquitecturas híbridas con \textbf{SSR e Hidratación} (como Next.js para React o Nuxt para Vue).
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\caption{Matriz comparativa formal de las seis arquitecturas web.}
+\label{tab:comparativa-arquitecturas}
+\footnotesize
+\begin{tabularx}{\textwidth}{l p{2cm} p{2.2cm} p{2.2cm} X}
+\toprule
+\textbf{Arquitectura} & \textbf{Servidor} & \textbf{Cliente (JS)} & \textbf{Experiencia (UX)} & \textbf{Caso de Uso Recomendado} \\
+\midrule
+\textbf{1. Web Estática} & Estático (Disco) & No ejecuta JS & Básica, recarga completa. & Documentación técnica, blogs personales, landing pages. \\
+\textbf{2. Web Interactiva} & Estático (Disco) & Efectos visuales y utilidades locales & Fluida en cliente, sin persistencia. & Páginas promocionales con animaciones, catálogos estáticos. \\
+\textbf{3. App Cliente Estático} & Dinámico (BD) & No ejecuta JS & Tosca, recarga continua de página. & Sistemas con conectividad crítica, entornos sin soporte de JS. \\
+\textbf{4. App Interactiva} & Dinámico (SSR) & Validaciones y efectos progresivos & Buena y robusta, SEO excelente. & Portales de comercio electrónico clásicos, webs corporativas. \\
+\textbf{5. App con AJAX} & Dinámico (SSR + API) & Peticiones en segundo plano & Muy fluida, actualización parcial. & Redes sociales con feeds continuos, paneles con datos en vivo. \\
+\textbf{6. App SPA} & Dinámico (API REST) & Control total del renderizado (CSR) & Óptima (sensación de app nativa). & Paneles de administración (dashboards), suites SaaS, webapps complejas. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+\section{Formatos de Intercambio de Datos: XML y JSON}
+
+En el modelo cliente-servidor desacoplado, los sistemas informáticos desarrollados en distintos lenguajes (un frontend en JavaScript y un backend en Java o Python) necesitan intercambiar información estructurada de manera universal, estandarizada e independiente de la plataforma. Los dos estándares dominantes en la historia de la Web son \textbf{XML} y \textbf{JSON}.
+
+\subsection{XML (eXtensible Markup Language)}
+
+Estandarizado por el W3C en 1998, XML es un metalenguaje de marcado derivado de SGML pensado para almacenar y transportar datos estructurados legibles tanto por humanos como por máquinas.
+
+\subsubsection{Sintaxis y Reglas de un Documento Bien Formado}
+Un documento XML se organiza en una estructura de árbol estricta compuesta por \textbf{elementos} y \textbf{atributos}:
+
+\begin{lstlisting}[language=XML, caption={Estructura canónica de un archivo XML (tolkien.xml).}]
+<?xml version="1.0" encoding="UTF-8"?>
+<character id="01">
+    <name>Galadriel</name>
+    <race>Elve</race>
+    <ring>Nenya</ring>
+</character>
+\end{lstlisting}
+
+Para que un archivo XML se considere \textbf{bien formado} (\textit{Well-Formed}), debe cumplir rigurosamente las siguientes restricciones sintácticas:
+\begin{enumerate}
+  \item \textbf{Prólogo / Declaración XML obligatoria:} Especifica la versión y la codificación (habitualmente UTF-8): \texttt{<?xml version="1.0" encoding="UTF-8"?>}.
+  \item \textbf{Elemento Raíz Único:} Debe existir un único elemento padre que envuelva a todos los demás elementos del documento.
+  \item \textbf{Cierre Obligatorio de Etiquetas:} Toda etiqueta de apertura (\texttt{<etiqueta>}) debe tener su correspondiente etiqueta de cierre (\texttt{</etiqueta>}), o ser autoclusiva (\texttt{<etiqueta/>}).
+  \item \textbf{Distinción de Mayúsculas y Minúsculas (*Case Sensitivity*):} \texttt{<Nombre>} y \texttt{<nombre>} son dos elementos completamente diferentes.
+  \item \textbf{Anidamiento Estricto:} Las etiquetas no pueden solaparse. Lo que se abre primero dentro de un elemento, debe cerrarse antes de cerrar el contenedor (\texttt{<a><b></b></a>} es correcto; \texttt{<a><b></a></b>} es un error fatal de análisis sintáctico).
+  \item \textbf{Reglas de Nomenclatura:}
+    \begin{itemize}
+      \item Los nombres deben comenzar por una letra o por un guión bajo (\texttt{\_}).
+      \item No pueden comenzar por números, signos de puntuación ni por la cadena reservada \texttt{xml} (en cualquier combinación de mayúsculas).
+      \item No están permitidos espacios en blanco ni retornos de carro antes o después del nombre de la etiqueta.
+      \item Se recomienda evitar guiones medios (\texttt{-}) y puntos (\texttt{.}) para no generar conflictos con analizadores sintácticos.
+    \end{itemize}
+  \item \textbf{Valores de Atributos Siempre Entrecomillados:} En XML, todo valor de atributo debe figurar obligatoriamente entre comillas dobles o simples (\texttt{id="01"}). Un elemento no puede tener atributos duplicados con el mismo nombre.
+\end{enumerate}
+
+\subsubsection{El Modelo Arbóreo del DOM en XML}
+Al procesar un archivo XML, el analizador construye en memoria el \textbf{DOM (Document Object Model)}: una jerarquía de nodos en la que el elemento raíz es el tronco y los elementos hijos, atributos y textos son ramas y hojas:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  node distance=1cm and 1.8cm,
+  rootnode/.style={draw=primary, fill=primary!20, thick, rounded corners, font=\bfseries, align=center},
+  childnode/.style={draw=secondary, fill=bglight, thick, rounded corners, font=\small, align=center},
+  leafnode/.style={draw=accent, fill=accent!10, rounded corners, font=\footnotesize, align=center}
+]
+  \node[rootnode] (root) {Elemento: character\\{\footnotesize atributo: id='01'}};
+  
+  \node[childnode, below left=of root] (c1) {Elemento: name};
+  \node[childnode, below=of root] (c2) {Elemento: race};
+  \node[childnode, below right=of root] (c3) {Elemento: ring};
+  
+  \node[leafnode, below=0.6cm of c1] (t1) {Texto: 'Galadriel'};
+  \node[leafnode, below=0.6cm of c2] (t2) {Texto: 'Elve'};
+  \node[leafnode, below=0.6cm of c3] (t3) {Texto: 'Nenya'};
+  
+  \draw[thick, primary, -{Stealth}] (root) -- (c1);
+  \draw[thick, primary, -{Stealth}] (root) -- (c2);
+  \draw[thick, primary, -{Stealth}] (root) -- (c3);
+  
+  \draw[thick, secondary, dashed, -{Stealth}] (c1) -- (t1);
+  \draw[thick, secondary, dashed, -{Stealth}] (c2) -- (t2);
+  \draw[thick, secondary, dashed, -{Stealth}] (c3) -- (t3);
+\end{tikzpicture}
+\caption{Representación en árbol DOM del documento XML.}
+\label{fig:arbol-dom-xml}
+\end{figure}
+
+\subsubsection{Validación en XML: DTD y XML Schema (XSD)}
+Un documento bien formado puede no ser semánticamente correcto según las reglas de negocio de una empresa. Para verificar que un XML cumple con la estructura esperada se utilizan mecanismos de validación:
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{DTD (Document Type Definition):} El mecanismo clásico de SGML. Define qué elementos están permitidos y cuántas veces pueden aparecer. Sus limitaciones son notables: no utiliza sintaxis XML y carece de tipado de datos (trata casi todo como cadenas de texto).
+  \item \textbf{XML Schema (XSD - XML Schema Definition):} Estandarizado por el W3C. Utiliza sintaxis nativa XML y proporciona un sistema de tipado fuerte y riguroso (enteros, booleanos, fechas, expresiones regulares, rangos numéricos), convirtiéndose en el estándar de oro en banca, telecomunicaciones y sistemas empresariales.
+\end{itemize}
+
+\subsection{JSON (JavaScript Object Notation)}
+
+Estandarizado por primera vez por Douglas Crockford a comienzos de los 2000 y formalizado bajo la norma internacional \textbf{ECMA-404} y el \textbf{RFC 8259}, JSON es un formato ultraligero de texto plano basado en un subconjunto de la notación literal de objetos de JavaScript.
+
+\subsubsection{Tipos de Datos y Estructura en JSON}
+Un documento JSON válido solo puede contener los siguientes tipos de datos fundamentales:
+
+\begin{enumerate}
+  \item \textbf{String (Cadena de texto):} Secuencia de caracteres Unicode delimitada \textbf{obligatoriamente por comillas dobles} (\texttt{"texto"}). Las comillas simples están terminantemente prohibidas en la especificación JSON.
+  \item \textbf{Number (Número):} Entero o de coma flotante en base 10 (ej. \texttt{42}, \texttt{-12.5}, \texttt{1.5e3}). No distingue entre enteros y flotantes.
+  \item \textbf{Boolean (Booleano):} Valores literales en minúscula: \texttt{true} o \texttt{false}.
+  \item \textbf{Null:} El valor nulo literal: \texttt{null}.
+  \item \textbf{Array (Arreglo / Lista ordenada):} Colección indexada de cero o más valores delimitada por corchetes: \texttt{[valor1, valor2, ...]}.
+  \item \textbf{Object (Objeto / Diccionario asociativo):} Colección no ordenada de pares clave-valor delimitada por llaves: \texttt{\{"clave": valor\}}. Las claves deben ser cadenas de texto entre comillas dobles.
+\end{enumerate}
+
+\begin{lstlisting}[language=json, caption={Ejemplo completo de objeto JSON estructurado con arrays y tipos mixtos.}]
+{
+  "city": "Móstoles",
+  "population": 214000,
+  "postal": [28931, 28933],
+  "active": true,
+  "points_of_interest": [
+    {
+      "name": "Plaza del Pradillo",
+      "category": "Plaza pública",
+      "rating": 4.6
+    },
+    {
+      "name": "Parque Natural El Soto",
+      "category": "Parque",
+      "rating": 4.8
+    }
+  ],
+  "mayor": null
+}
+\end{lstlisting}
+
+\begin{importante}{Restricciones Críticas en la Sintaxis de JSON}
+\begin{enumerate}
+  \item \textbf{Ausencia de Comentarios:} El estándar oficial JSON prohíbe taxativamente los comentarios (\texttt{//...} o \texttt{/*...*/}). Douglas Crockford eliminó deliberadamente los comentarios para impedir que la gente utilizara directivas de compilación propietarias que destruyeran la interoperabilidad entre analizadores. Para archivos de configuración que requieran comentarios se utiliza una variante denominada \textbf{JSONC} (soportada en VS Code).
+  \item \textbf{Prohibición de la Coma Final (*Trailing Comma*):} Poner una coma tras el último atributo de un objeto o array (ejemplo: \texttt{\{"a": 1, "b": 2,\}}) provoca un error de sintaxis fatal en cualquier analizador JSON estricto.
+  \item \textbf{Codificación:} La codificación obligatoria por defecto para transmisión en red es \textbf{UTF-8}.
+\end{enumerate}
+\end{importante}
+
+\subsubsection{Validación en JSON: JSON Schema}
+Al igual que XSD en XML, en el ecosistema JSON existe la especificación \textbf{JSON Schema}. Permite declarar formalmente la estructura esperada de una API REST: tipos de datos obligatorios, expresiones regulares para emails o códigos postales, y validación automática de payloads en frameworks como Express o FastAPI.
+
+\subsection{Comparativa Técnica Exhaustiva: XML vs. JSON}
+
+\begin{table}[htbp]
+\centering
+\caption{Comparativa técnica de ingeniería entre XML y JSON.}
+\label{tab:xml-vs-json}
+\small
+\begin{tabularx}{\textwidth}{>{\raggedright\arraybackslash\bfseries}p{3cm} X X}
+\toprule
+\textbf{Criterio de Evaluación} & \textbf{XML (Extensible Markup Language)} & \textbf{JSON (JavaScript Object Notation)} \\
+\midrule
+\textbf{Verbosidad y Tamaño} & Muy alta. Requiere etiquetas de apertura y cierre explícitas repetidas (\texttt{<nombre>...</nombre>}), consumiendo más ancho de banda. & Muy baja. Sintaxis compacta y directa basada en llaves y corchetes. \\
+\textbf{Coste de Análisis (Parsing)} & Elevado. Requiere analizadores DOM complejos que consumen abundante memoria y ciclos de CPU. & Muy bajo y ultra-rápido. En JavaScript la conversión es instantánea y nativa (\texttt{JSON.parse()}). \\
+\textbf{Tipado Nativo} & No nativo. En el documento todo es texto; el tipado requiere esquemas XSD externos. & Nativo (distingue números, booleanos, cadenas, listas, objetos y null de forma inherente). \\
+\textbf{Soporte de Metadatos} & Excelente mediante el uso de atributos en las etiquetas (\texttt{<fecha format="ISO">}). & Debe modelarse explícitamente mediante subobjetos. \\
+\textbf{Seguridad y Vulnerabilidades} & Susceptible a ataques complejos como \textbf{XXE} (\textit{XML External Entity}) y bombas XML (\textit{Billion Laughs}). & Más seguro por diseño, aunque vulnerable a inyecciones si se procesa erróneamente con \texttt{eval()}. \\
+\textbf{Dominio Actual} & Documentos ofimáticos (DOCX, XLSX), SVG, feeds RSS, integración bancaria/SOAP. & \textbf{El estándar absoluto} de las APIs REST modernas, microservicios y la Web actual. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+\section{Ejercicios Prácticos Resueltos del Tema 1}
+
+A continuación se resuelven paso a paso los ejercicios planteados en el temario oficial del curso.
+
+\begin{ejercicioresuelto}{Ejercicio 1: Modelado de un Currículum Vitae en XML}
+\textbf{Enunciado Oficial:} \textit{Crea un archivo XML que represente la información de un Currículum Vitae (CV) con las siguientes secciones: Información Personal, Experiencia Laboral, Educación, Habilidades e Idiomas con sus respectivos niveles.}
+
+\textbf{Solución de Ingeniería:} Se diseña un documento XML bien formado, respetando las buenas prácticas de nomenclatura, utilizando atributos para metadatos identificativos e incorporando la cabecera correspondiente.
+
+\begin{lstlisting}[language=XML, caption={currículum\_vitae.xml: Solución completa al Ejercicio 1.}]
+<?xml version="1.0" encoding="UTF-8"?>
+<curriculum_vitae id="CV-2026-0042" lang="es">
+    <!-- Seccion 1: Informacion Personal -->
+    <informacion_personal>
+        <nombre_completo>David Sebastian Sticea Covaciu</nombre_completo>
+        <titulo_profesional>Ingeniero de Software</titulo_profesional>
+        <contacto>
+            <email>david.sticea@alumnos.urjc.es</email>
+            <telefono prefijo="+34">600123456</telefono>
+            <direccion>
+                <calle>Calle Tulipán s/n</calle>
+                <ciudad>Móstoles</ciudad>
+                <codigo_postal>28933</codigo_postal>
+                <pais>España</pais>
+            </direccion>
+        </contacto>
+    </informacion_personal>
+
+    <!-- Seccion 2: Experiencia Laboral -->
+    <experiencia_laboral>
+        <puesto id="exp_01">
+            <cargo>Desarrollador Web Full-Stack</cargo>
+            <empresa>Tech Solutions S.L.</empresa>
+            <periodo>
+                <fecha_inicio>2024-02-01</fecha_inicio>
+                <fecha_fin>2025-08-31</fecha_fin>
+            </periodo>
+            <responsabilidades>
+                <item>Desarrollo de APIs RESTful utilizando Node.js y Express.</item>
+                <item>Maquetación de interfaces responsivas con HTML5 y Bootstrap 5.</item>
+            </responsabilidades>
+        </puesto>
+    </experiencia_laboral>
+
+    <!-- Seccion 3: Educacion -->
+    <educacion>
+        <estudio id="edu_01">
+            <titulacion>Grado en Ingeniería del Software</titulacion>
+            <institucion>Universidad Rey Juan Carlos</institucion>
+            <anio_inicio>2023</anio_inicio>
+            <anio_graduacion>2027</anio_graduacion>
+        </estudio>
+    </educacion>
+
+    <!-- Seccion 4: Habilidades -->
+    <habilidades>
+        <habilidad categoria="Frontend">HTML5 / CSS3 / JavaScript</habilidad>
+        <habilidad categoria="Frontend">Bootstrap 5</habilidad>
+        <habilidad categoria="Backend">Java / Spring Boot</habilidad>
+        <habilidad categoria="Bases de Datos">PostgreSQL / MongoDB</habilidad>
+        <habilidad categoria="Herramientas">Git / Docker / Linux</habilidad>
+    </habilidades>
+
+    <!-- Seccion 5: Idiomas -->
+    <idiomas>
+        <idioma codigo="es" nivel="Nativo">Español</idioma>
+        <idioma codigo="en" nivel="C1">Inglés (Certificado Cambridge)</idioma>
+        <idioma codigo="ro" nivel="Bilingüe">Rumano</idioma>
+    </idiomas>
+</curriculum_vitae>
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\newpage
+
+\begin{ejercicioresuelto}{Ejercicio 2: Traducción Canónica del CV a JSON}
+\textbf{Enunciado Oficial:} \textit{Traduce el Ejercicio 1 de un Currículum Vitae con XML a formato JSON.}
+
+\textbf{Solución de Ingeniería:} En la traducción a JSON aprovechamos las estructuras nativas que no existían de forma limpia en XML: los arrays de objetos indexados (\texttt{[]}), valores booleanos y números enteros reales sin necesidad de comillas. Nótese cómo la verbosidad disminuye drásticamente y la legibilidad aumenta.
+
+\begin{lstlisting}[language=json, caption={curriculum\_vitae.json: Solución canónica al Ejercicio 2.}]
+{
+  "curriculum_vitae": {
+    "id": "CV-2026-0042",
+    "idioma_documento": "es",
+    "informacion_personal": {
+      "nombre_completo": "David Sebastián Sticea Covaciu",
+      "titulo_profesional": "Ingeniero de Software",
+      "contacto": {
+        "email": "david.sticea@alumnos.urjc.es",
+        "telefono": {
+          "prefijo": "+34",
+          "numero": 600123456
+        },
+        "direccion": {
+          "calle": "Calle Tulipán s/n",
+          "ciudad": "Móstoles",
+          "codigo_postal": 28933,
+          "pais": "España"
+        }
+      }
+    },
+    "experiencia_laboral": [
+      {
+        "id": "exp_01",
+        "cargo": "Desarrollador Web Full-Stack",
+        "empresa": "Tech Solutions S.L.",
+        "periodo": {
+          "fecha_inicio": "2024-02-01",
+          "fecha_fin": "2025-08-31"
+        },
+        "responsabilidades": [
+          "Desarrollo de APIs RESTful utilizando Node.js y Express.",
+          "Maquetación de interfaces responsivas con HTML5 y Bootstrap 5."
+        ]
+      }
+    ],
+    "educacion": [
+      {
+        "id": "edu_01",
+        "titulacion": "Grado en Ingeniería del Software",
+        "institucion": "Universidad Rey Juan Carlos",
+        "anio_inicio": 2023,
+        "anio_graduacion": 2027
+      }
+    ],
+    "habilidades": [
+      { "nombre": "HTML5 / CSS3 / JavaScript", "categoria": "Frontend" },
+      { "nombre": "Bootstrap 5", "categoria": "Frontend" },
+      { "nombre": "Java / Spring Boot", "categoria": "Backend" },
+      { "nombre": "PostgreSQL / MongoDB", "categoria": "Bases de Datos" },
+      { "nombre": "Git / Docker / Linux", "categoria": "Herramientas" }
+    ],
+    "idiomas": [
+      { "idioma": "Español", "codigo": "es", "nivel": "Nativo" },
+      { "idioma": "Inglés", "codigo": "en", "nivel": "C1", "certificado": "Cambridge" },
+      { "idioma": "Rumano", "codigo": "ro", "nivel": "Bilingüe" }
+    ]
+  }
+}
+\end{lstlisting}
+\end{ejercicioresuelto}

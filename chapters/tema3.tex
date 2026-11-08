@@ -1,0 +1,2293 @@
+\chapter{Tecnologías del Servidor Web: JavaScript, Node.js, Express y MongoDB}
+\label{cap:tema3}
+
+En este capítulo se aborda de manera exhaustiva el desarrollo del lado del servidor (backend) en la web moderna. Partiendo de los fundamentos del lenguaje JavaScript, sus runtimes (con especial énfasis en Node.js y el motor V8) y sus mecanismos avanzados de estructuras de datos y modularidad (ESM y CommonJS), se transita hacia la creación de aplicaciones web estructuradas mediante el framework Express. Se profundiza en la gestión del ciclo de petición-respuesta HTTP, el renderizado de vistas con el motor de plantillas Mustache, la subida segura de archivos multipartes con Multer, y el manejo de persistencia mediante bases de datos documentales con MongoDB y su driver oficial para Node.js. El contenido integra la totalidad de las diapositivas de la asignatura enriquecidas con las justificaciones arquitectónicas, modelos de memoria y consideraciones de seguridad imprescindibles para un ingeniero de software.
+
+\section{Introducción a JavaScript y Runtimes (3.1.1)}
+
+\subsection{Naturaleza y Evolución de JavaScript}
+
+JavaScript nació en 1995 de la mano de Brendan Eich en Netscape Communications, bajo el nombre original de \textbf{Mocha}, posteriormente rebautizado como \textbf{LiveScript} y finalmente denominado \textbf{JavaScript}. Dicha denominación comercial respondió a una estrategia de marketing deliberada: en aquel momento Java experimentaba un auge extraordinario en la industria, por lo que se aprovechó la notoriedad del nombre pese a tratarse de dos tecnologías con filosofías, paradigmas y modelos de ejecución completamente independientes.
+
+\begin{importante}{JavaScript no es Java}
+A pesar de compartir similitudes superficiales en la sintaxis de control de flujo heredada del lenguaje C (como las llaves \texttt{\{\}}, bucles \texttt{for} y condicionales \texttt{if}), Java y JavaScript son diametralmente opuestos:
+\begin{itemize}
+    \item \textbf{Java:} Lenguaje de tipado estático y fuerte, fuertemente orientado a clases basadas en clases, compilado a bytecode intermedio que se ejecuta sobre la Máquina Virtual de Java (JVM).
+    \item \textbf{JavaScript:} Lenguaje de tipado dinámico y débil, multiparadigma, orientado a objetos basado originalmente en prototipos, ejecutado por runtimes que emplean compilación Just-In-Time (JIT) sobre el código fuente original.
+\end{itemize}
+\end{importante}
+
+El estándar formal que rige la sintaxis y evolución de JavaScript es \textbf{ECMAScript}, administrado por la organización internacional \textbf{ECMA} a través del comité técnico \textbf{TC39} (\emph{Technical Committee 39}), a diferencia de los estándares de marcado y estilo (HTML y CSS) que son regulados por el \textbf{W3C}. En los primeros años del desarrollo web, los distintos fabricantes de navegadores implementaban dialectos con divergencias notables (como JScript en Internet Explorer), lo que causaba graves problemas de interoperabilidad. En la actualidad, la adopción rigurosa del estándar ECMAScript (a partir de la trascendental especificación ECMAScript 2015 o ES6) garantiza una compatibilidad homogénea entre todos los motores modernos.
+
+Las propiedades esenciales que definen a JavaScript como lenguaje son:
+\begin{enumerate}
+    \item \textbf{Lenguaje de Scripting (Interpretado/JIT):} No requiere de un paso de compilación manual previo para generar binarios ejecutables. El runtime analiza el código fuente, genera un árbol sintáctico abstracto (AST) y lo compila dinámicamente en tiempo de ejecución.
+    \item \textbf{Tipado Dinámico:} Los tipos están asociados a los valores en memoria y no a las variables. Una misma variable puede albergar valores de distinta naturaleza a lo largo de su ciclo de vida.
+    \item \textbf{Funciones de Primer Orden:} Las funciones son tratadas como cualquier otro valor: pueden asignarse a variables, pasarse como argumentos a otras rutinas y devolverse como resultado desde otras funciones, posibilitando el paradigma funcional.
+    \item \textbf{Orientación a Objetos Prototípica y Basada en Clases:} Permite la creación y mutación dinámica de objetos en tiempo de ejecución, extendida con la sintaxis de clases formales introducida en ES6.
+\end{enumerate}
+
+\subsection{JavaScript en el Navegador vs Fuera del Navegador}
+
+Durante más de una década, JavaScript existió de forma casi exclusiva confinado dentro del entorno del navegador web (\emph{browser environment}), donde su cometido principal consistía en aportar interactividad mediante la manipulación del Document Object Model (DOM), responder a eventos de la interfaz de usuario y orquestar comunicaciones asíncronas con el servidor sin recargar la página (AJAX / Fetch API).
+
+\begin{definicion}{Runtime de JavaScript}
+Un \textbf{runtime} es el entorno de ejecución completo que engloba un motor de JavaScript (encargado de parsear y ejecutar el código) junto con un conjunto de interfaces de programación de aplicaciones (APIs) provistas por el host y un bucle de eventos (\emph{Event Loop}) que gestiona las tareas asíncronas y la concurrencia.
+\end{definicion}
+
+En 2009, Ryan Dahl presentó \textbf{Node.js}, un proyecto que extrajo el motor \textbf{V8} (desarrollado por Google para el navegador Chrome) y lo combinó con una biblioteca en C llamada \textbf{libuv} para dotar a JavaScript de acceso directo a los recursos del sistema operativo: sistema de archivos (\emph{filesystem}), conexiones de red TCP/UDP, procesos del sistema y memoria binaria nativa (\emph{buffers}).
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=primary, fill=bglight, thick, minimum width=3.4cm, minimum height=1cm, align=center, rounded corners=3pt},
+    header/.style={rectangle, draw=secondary, fill=secondary!15, thick, minimum width=3.4cm, minimum height=0.7cm, align=center, font=\bfseries\small},
+    group/.style={rectangle, draw=bordergray, dashed, fill=bgcode, rounded corners=6pt, inner sep=10pt}
+]
+    % Navegador
+    \node[header] (bhead) at (0, 3.2) {Navegador Web};
+    \node[box] (bv8) at (0, 2.0) {Motor JavaScript\\(V8, SpiderMonkey)};
+    \node[box] (bapi) at (0, 0.6) {Web APIs de Navegador\\(DOM, BOM, Fetch,\\Canvas, LocalStorage)};
+    \node[group, fit=(bhead) (bv8) (bapi)] (bgroup) {};
+
+    % Node.js
+    \node[header] (nhead) at (6.5, 3.2) {Entorno Node.js};
+    \node[box] (nv8) at (6.5, 2.0) {Motor V8 de Google\\(Compilación JIT)};
+    \node[box] (napi) at (6.5, 0.6) {Node.js Core APIs + libuv\\(fs, net, http, crypto,\\Event Loop nativo)};
+    \node[group, fit=(nhead) (nv8) (napi)] (ngroup) {};
+\end{tikzpicture}
+\caption{Divergencia arquitectónica entre el runtime de navegador y el runtime de servidor Node.js.}
+\label{fig:runtimes-comparison}
+\end{figure}
+
+Aunque Node.js es el runtime fuera del navegador más extendido en la industria, existen alternativas modernas notables:
+\begin{itemize}
+    \item \textbf{Deno:} Creado también por Ryan Dahl con un enfoque reforzado en seguridad (acceso denegado por defecto a red y disco), soporte nativo de TypeScript y adherencia estricta a los estándares Web API.
+    \item \textbf{Bun:} Diseñado desde cero en lenguaje Zig, enfocado en maximizar el rendimiento de arranque y ejecución, integrando empaquetador, transpilador y gestor de paquetes ultra-rápido.
+\end{itemize}
+
+\subsection{Arquitectura, Rendimiento y Concurrencia en Node.js}
+
+Desde la perspectiva de la ingeniería de software, la ventaja competitiva de Node.js no radica en la velocidad de cálculo matemático puro de JavaScript (donde lenguajes compilados con tipado estático como C, Rust o Go resultan superiores), sino en su \textbf{modelo de entrada/salida no bloqueante y dirigido por eventos} (\emph{Non-blocking Event-Driven I/O}).
+
+\begin{itemize}
+    \item \textbf{Modelo tradicional basado en hilos (Thread-per-request):} Servidores como Apache HTTP Server o contenedores tradicionales de servlets en Java asignan un hilo del sistema operativo a cada cliente conectado. Mientras el hilo espera una consulta a la base de datos o una lectura en disco, permanece inactivo (bloqueado), consumiendo recursos de memoria de pila (alrededor de 1--2 MB por hilo) y sobrecargando al planificador del sistema operativo con continuos cambios de contexto (\emph{context switches}).
+    \item \textbf{Modelo de Node.js (Single Thread con Event Loop):} Un único hilo principal de ejecución atiende todas las peticiones entrantes. Cuando se requiere una operación de E/S costosa (acceso a disco, consulta de red), Node delega la tarea a los hilos de soporte de bajo nivel de \texttt{libuv} o al propio núcleo del sistema operativo. El hilo principal queda libre de inmediato para procesar otras peticiones. Una vez finalizada la operación de E/S, se encola una función de retorno (\emph{callback} o resolución de promesa) que el \textbf{Event Loop} ejecuta cuando la pila de llamadas queda vacía.
+\end{itemize}
+
+\begin{definicion}{Ventajas en Arquitecturas Modernas}
+\begin{enumerate}
+    \item \textbf{Alta concurrencia en E/S:} Capacidad de mantener decenas de miles de conexiones concurrentes abiertas con un consumo de memoria mínimo.
+    \item \textbf{Tiempo de arranque casi instantáneo:} Característica crítica en arquitecturas \emph{Serverless} (como AWS Lambda o Google Cloud Run), donde las funciones deben instanciarse bajo demanda sin incurrir en latencias excesivas de inicio en frío (\emph{cold starts}).
+\end{enumerate}
+\end{definicion}
+
+\subsection{Versiones de Node.js y Entorno de Desarrollo}
+
+El proyecto Node.js sigue un calendario de versiones semestral:
+\begin{itemize}
+    \item \textbf{Versiones Current (Actuales):} Incorporan las funcionalidades de vanguardia de ECMAScript y APIs experimentales. Tienen un ciclo de vida corto y no están recomendadas para despliegues empresariales en producción.
+    \item \textbf{Versiones LTS (Long Term Support):} Cada versión par (v18, v20, v22) entra en fase LTS activa y recibe soporte de seguridad y correcciones de errores críticas durante 30 meses. Es el estándar indiscutible para entornos corporativos y de producción.
+\end{itemize}
+
+Para la construcción y depuración de proyectos utilizaremos el editor \textbf{Visual Studio Code (VS Code)}, el cual incluye integración nativa con el depurador de Node.js, terminal integrado y gestión de puntos de ruptura (\emph{breakpoints}) interactivos para inspeccionar el estado de la pila y variables locales en tiempo de ejecución.
+
+\begin{ejercicioresuelto}{1}{Hola Mundo en Navegador y Node.js}
+\textbf{Enunciado:} Construir una solución mínima que demuestre la ejecución de código JavaScript en ambos entornos:
+\begin{enumerate}
+    \item En el navegador mediante un documento HTML \texttt{index.html} que enlace un script externo \texttt{app.js}.
+    \item En el servidor ejecutando directamente el script mediante el comando de Node.js.
+\end{enumerate}
+
+\textbf{Solución y Análisis:}
+
+Para el entorno del navegador, creamos el archivo de script:
+\begin{lstlisting}[language=javascript, caption={app.js para navegador y servidor}]
+console.log("Hello World!");
+\end{lstlisting}
+
+Y el documento HTML que lo referencia:
+\begin{lstlisting}[language=html, caption={index.html para ejecución en navegador}]
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Ejercicio 1 - Hello World</title>
+    <!-- El navegador descarga y ejecuta el script al analizar la cabecera -->
+    <script src="app.js"></script>
+</head>
+<body>
+    <h1>Abra la Consola de Desarrollador (F12)</h1>
+</body>
+</html>
+\end{lstlisting}
+
+Al abrir \texttt{index.html} en Google Chrome y desplegar las herramientas de desarrollador (\emph{DevTools} $\rightarrow$ pestaña \emph{Console}), observamos la salida \texttt{'Hello World!'}.
+
+Para el entorno Node.js, no es necesario ningún documento HTML ni entorno gráfico. Basta con abrir una terminal en el directorio del archivo y ejecutar:
+\begin{lstlisting}[language=bash, caption={Ejecución directa en consola con Node.js}]
+$ node app.js
+Hello World!
+\end{lstlisting}
+En este segundo caso, el proceso arranca, inicializa el motor V8, compila \texttt{app.js}, imprime la cadena en la salida estándar (\texttt{stdout}) del sistema y finaliza el proceso de forma limpia.
+\end{ejercicioresuelto}
+
+\section{El Lenguaje JavaScript (3.1.2)}
+
+\subsection{Comparativa de Paradigmas: Java vs JavaScript}
+
+Para un ingeniero de software habituado a Java, la transición hacia JavaScript requiere interiorizar diferencias fundamentales en el sistema de tipos y el modelo de ejecución:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{3.2cm} X X}
+\toprule
+\textbf{Dimensión} & \textbf{Java} & \textbf{JavaScript} \\
+\midrule
+\textbf{Sistema de Tipos} & Estático y Fuerte. Los tipos se declaran en código y se validan en tiempo de compilación. & Dinámico y Débil. Los tipos se infieren en tiempo de ejecución y se permiten conversiones automáticas implícitas. \\
+\addlinespace
+\textbf{Compilación} & Código fuente $\rightarrow$ Bytecode (\texttt{.class}) $\rightarrow$ Ejecutado por JVM. & Código fuente analizado directamente por el runtime; compilación JIT transparente a máquina. \\
+\addlinespace
+\textbf{Tipos Primitivos vs Objetos} & Coexisten tipos primitivos (\texttt{int}, \texttt{double}) con objetos envoltura (\texttt{Integer}). & Todos los valores se comportan conceptualmente como objetos con propiedades y métodos. \\
+\addlinespace
+\textbf{Modelo Orientado a Objetos} & Basado estrictamente en clases cerradas. Las clases definen la estructura fija de los objetos. & Basado en prototipos. En tiempo de ejecución se pueden añadir, modificar o borrar propiedades de cualquier objeto. \\
+\addlinespace
+\textbf{Funciones} & Siempre vinculadas a una clase (métodos de instancia o estáticos). Lambdas son interfaces funcionales. & Ciudadanos de primer orden independientes (\emph{first-class citizens}). Pueden existir aisladas. \\
+\addlinespace
+\textbf{Manejo de Memoria} & Recolector de basura (Garbage Collector) sobre la memoria Heap de la JVM. & Recolector de basura automático sobre el Heap del motor V8 (marcado y barrido generacional). \\
+\bottomrule
+\end{tabularx}
+\caption{Comparativa técnica de fundamentos entre Java y JavaScript.}
+\label{tab:java-vs-js}
+\end{table}
+
+\subsection{Sintaxis Básica, Declaración de Variables y Tipos}
+
+En JavaScript, las instrucciones pueden terminar opcionalmente en punto y coma (\texttt{;}). El intérprete dispone de un mecanismo denominado \emph{Automatic Semicolon Insertion} (ASI) que inserta puntos y coma automáticamente en los saltos de línea; sin embargo, en ingeniería de software profesional se recomienda explícitamente escribir los puntos y coma para prevenir comportamientos anómalos en retornos de función multilínea.
+
+\subsubsection{Declaración: \texttt{let}, \texttt{const} y la problemática de \texttt{var}}
+En el estándar original de JavaScript se utilizaba la palabra reservada \texttt{var}. En el desarrollo moderno, \textbf{\texttt{var} está formalmente desaconsejada}:
+\begin{itemize}
+    \item \texttt{var} tiene ámbito de función (\emph{function scope}) e ignora los bloques delimitados por llaves (como \texttt{if} o \texttt{for}). Además, sufre de \emph{hoisting} (elevación implícita de la declaración a la cabecera del ámbito con valor \texttt{undefined}).
+    \item \texttt{let} introduce \textbf{ámbito de bloque} (\emph{block scope}), garantizando que la variable solo sea accesible dentro del bloque \texttt{\{ \}} donde fue declarada, exactamente igual que en Java o C++.
+    \item \texttt{const} declara una referencia inmutable de bloque. La variable debe inicializarse obligatoriamente en su declaración y no puede reasignarse.
+\end{itemize}
+
+\begin{importante}{Mutabilidad de objetos con \texttt{const}}
+Declarar un array u objeto con \texttt{const} impide reasignar la variable a otro objeto en memoria, pero \textbf{no hace inmutable su contenido interno}. Las propiedades del objeto o elementos del array pueden ser modificados libremente:
+\begin{lstlisting}[language=javascript]
+const usuario = { nombre: "Ana", edad: 25 };
+usuario.edad = 26; // TOTALMENTE VALIDO (mutacion interna)
+// usuario = { nombre: "Carlos" }; // ERROR: Assignment to constant variable.
+\end{lstlisting}
+\end{importante}
+
+\subsubsection{Valores no definidos y nulidad}
+JavaScript distingue claramente entre dos conceptos que en otros lenguajes suelen colapsar:
+\begin{itemize}
+    \item \texttt{undefined}: Representa la ausencia de valor por defecto. Es el valor que adquiere cualquier variable declarada que aún no ha sido inicializada, o el retorno de funciones sin sentencia \texttt{return} explícita.
+    \item \texttt{null}: Representa la ausencia intencionada y explícita de cualquier objeto o referencia. Se asigna de manera deliberada por el programador.
+\end{itemize}
+
+Si se intenta acceder a una variable que nunca fue declarada, el motor lanza una excepción \texttt{ReferenceError}. No obstante, si se asigna un valor a una variable no declarada sin usar el modo estricto (\emph{strict mode}), JavaScript creará accidentalmente una variable global, lo que constituye una fuente habitual de errores críticos.
+
+\subsubsection{Tipos de datos básicos y Template Strings}
+Los tipos de datos primitivos en JavaScript son:
+\begin{itemize}
+    \item \textbf{Number:} Representa tanto números enteros como números reales de coma flotante utilizando el formato IEEE 754 de 64 bits (doble precisión). La división entre números enteros que no sea exacta resulta siempre en un número real (\texttt{5 / 2 === 2.5}). Dispone de valores especiales como \texttt{Infinity}, \texttt{-Infinity} y \texttt{NaN} (\emph{Not a Number}, generado por operaciones aritméticas inválidas como \texttt{0 / 0} o parseos fallidos).
+    \item \textbf{Boolean:} Valores booleanos estrictos: \texttt{true} o \texttt{false}.
+    \item \textbf{String:} Secuencia inmutable de caracteres UTF-16. Se puede delimitar mediante comillas simples (\texttt{'...'}) o dobles (\texttt{'...'}). No existe un tipo de dato \texttt{char} dedicado; un carácter individual es simplemente un string de longitud 1.
+    \item \textbf{Template Literals (Template Strings):} Cadenas delimitadas por comillas invertidas (\texttt{`...`}). Ofrecen soporte nativo para interpolación de expresiones mediante la sintaxis \texttt{\$\{expresion\}} y permiten cadenas multilínea limpias sin requerir concatenación con \texttt{+} o caracteres de escape \texttt{\textbackslash n}:
+\begin{lstlisting}[language=javascript]
+let usuario = "Maria";
+let intentos = 3;
+console.log(`El usuario ${usuario} ha consumido ${intentos} intentos.`);
+\end{lstlisting}
+\end{itemize}
+
+\subsection{Operadores, Coerción de Tipos e Igualdad Estricta}
+
+Uno de los aspectos más críticos en ingeniería de software con JavaScript es comprender la diferencia entre la \textbf{igualdad abstracta o débil} (\texttt{==}) y la \textbf{igualdad estricta} (\texttt{===}).
+
+\begin{definicion}{Igualdad Débil vs Igualdad Estricta}
+\begin{itemize}
+    \item \textbf{Operador \texttt{==} (Igualdad Débil con Coerción):} Si los dos operandos son de distinto tipo, JavaScript intenta convertir implícitamente uno de ellos a un tipo común antes de comparar. Esto conduce a anomalías antiintuitivas:
+    \begin{itemize}
+        \item \texttt{'' == 0} evalúa a \texttt{true} (cadena vacía se coacciona a 0).
+        \item \texttt{0 == false} evalúa a \texttt{true}.
+        \item \texttt{'0' == false} evalúa a \texttt{true}.
+        \item \texttt{null == undefined} evalúa a \texttt{true}.
+    \end{itemize}
+    \item \textbf{Operador \texttt{===} (Igualdad Estricta sin Coerción):} Devuelve \texttt{true} única y exclusivamente si ambos operandos son del mismo tipo y poseen exactamente el mismo valor.
+\end{itemize}
+\end{definicion}
+
+\begin{importante}{Regla de oro de ingeniería}
+En código de producción profesional, se debe utilizar \textbf{siempre el operador de igualdad estricta (\texttt{===}) y de desigualdad estricta (\texttt{!==})}, eliminando cualquier riesgo de bugs silenciosos debidos a la coerción implícita de tipos.
+\end{importante}
+
+En cuanto a la comparación de referencias:
+\begin{itemize}
+    \item Dos cadenas de caracteres (\texttt{String}) son comparadas por su \textbf{contenido lexicográfico}: si poseen los mismos caracteres en el mismo orden, \texttt{===} evalúa a \texttt{true} (análogo al método \texttt{.equals()} de Java).
+    \item Dos objetos o arrays son comparados por su \textbf{identidad de referencia}: \texttt{===} solo devuelve \texttt{true} si ambas variables apuntan a la misma dirección física de memoria en el heap (análogo al operador \texttt{==} en Java para referencias).
+\end{itemize}
+
+\subsection{Arrays en JavaScript}
+
+Un array en JavaScript es un objeto especializado que mantiene una colección indexada con base 0. A diferencia de los arrays estáticos de Java (de tamaño inmutable y tipo homogéneo), los arrays en JavaScript:
+\begin{enumerate}
+    \item Son completamente dinámicos: crecen y decrecen en tiempo de ejecución sin necesidad de dimensionamiento previo.
+    \item Son heterogéneos: pueden almacenar valores de diferentes tipos de datos mezclados dentro de la misma instancia (\texttt{['texto', 42, true, \{ id: 1 \}]}).
+    \item Poseen la propiedad \texttt{length}: dicha propiedad no es de solo lectura; modificar manualmente \texttt{array.length} trunca o expande el array.
+\end{enumerate}
+
+\subsubsection{Acceso fuera de rango y arrays dispersos}
+Si se intenta leer una posición más allá del rango actual del array (\texttt{array[99]}), JavaScript no lanza ninguna excepción de desbordamiento de índice (como ocurriría con \texttt{ArrayIndexOutOfBoundsException} en Java), sino que devuelve limpiamente el valor \texttt{undefined}.
+
+Por el contrario, si se asigna un valor a una posición más allá de los límites actuales:
+\begin{lstlisting}[language=javascript]
+let numeros = [10, 20];
+numeros[4] = 50; 
+// El array pasa a ser: [10, 20, undefined, undefined, 50]
+// Su propiedad length se actualiza automaticamente a 5
+\end{lstlisting}
+Esto genera un \textbf{array disperso} (\emph{sparse array}), donde las posiciones intermedias no inicializadas contienen huecos (\emph{empty slots}) que devuelven \texttt{undefined} al ser leídas.
+
+\subsubsection{Operaciones de mutación sobre Arrays}
+\begin{itemize}
+    \item \texttt{push(elem1, ...)}: Añade uno o más elementos al final del array e incrementa su longitud, devolviendo la nueva longitud. Complejidad $O(1)$ amortizada.
+    \item \texttt{pop()}: Extrae y devuelve el último elemento del array, decrementando \texttt{length} en 1. Complejidad $O(1)$.
+    \item \texttt{shift()}: Extrae y devuelve el primer elemento (índice 0), desplazando todos los elementos restantes a la izquierda. Complejidad $O(n)$.
+    \item \texttt{unshift(elem1, ...)}: Inserta elementos al comienzo del array desplazando los existentes a la derecha. Complejidad $O(n)$.
+    \item Operador \texttt{delete array[i]}: Elimina el valor del índice especificado pero \textbf{no redimensiona el array}; deja un hueco con valor \texttt{undefined}.
+    \item Método \texttt{splice(start, deleteCount, item1, item2, ...)}: Permite modificar el contenido de un array eliminando elementos existentes y/o agregando nuevos elementos en cualquier posición intermedia sin dejar huecos:
+\begin{lstlisting}[language=javascript]
+let frutas = ['manzana', 'pera', 'platano', 'uva'];
+// Borrar 1 elemento a partir del indice 1 ('pera')
+frutas.splice(1, 1); // frutas: ['manzana', 'platano', 'uva']
+
+// Insertar 'naranja' en el indice 1 sin borrar ninguno
+frutas.splice(1, 0, 'naranja'); // frutas: ['manzana', 'naranja', 'platano', 'uva']
+\end{lstlisting}
+\end{itemize}
+
+\subsection{Sentencias de Control de Flujo y Evaluación Booleana}
+
+Las estructuras condicionales (\texttt{if}, \texttt{else if}, \texttt{else}) y de bucle (\texttt{for}, \texttt{while}, \texttt{do...while}, \texttt{switch}) comparten la sintaxis familiar de los lenguajes derivados de C. Sin embargo, en JavaScript la condición evaluada en un \texttt{if} no requiere ser estrictamente un valor booleano: se evalúa la veracidad intrínseca (\emph{truthiness}) del valor.
+
+\begin{definicion}{Valores Falsy en JavaScript}
+Existen exactamente \textbf{seis valores falsy} que se evalúan automáticamente a \texttt{false} en contextos booleanos:
+\begin{enumerate}
+    \item \texttt{false}
+    \item \texttt{0} (y \texttt{-0}, \texttt{0n})
+    \item \texttt{''} (cadena de texto vacía)
+    \item \texttt{null}
+    \item \texttt{undefined}
+    \item \texttt{NaN}
+\end{enumerate}
+Cualquier otro valor en el lenguaje (incluyendo cadenas no vacías como \texttt{'0'}, arrays vacíos \texttt{[]} y objetos vacíos \texttt{\{\}}) se evalúa como \textbf{truthy} (\texttt{true}).
+\end{definicion}
+
+Esta propiedad permite escribir expresiones idiomáticas concisas para validar la presencia de valores o cadenas:
+\begin{lstlisting}[language=javascript]
+let nombreUsuario = req.body.nombre;
+if (!nombreUsuario) {
+    // Se ejecuta si nombreUsuario es undefined, null o cadena vacia ""
+    nombreUsuario = "Anonimo";
+}
+\end{lstlisting}
+
+\subsection{Funciones, Ámbitos, Clausuras y Funciones Flecha}
+
+Las funciones constituyen el pilar fundamental sobre el que se articula la arquitectura de JavaScript.
+
+\subsubsection{Declaración de Funciones y Funciones Anónimas}
+Una función puede definirse mediante una declaración tradicional con nombre o asignando una función anónima a una variable:
+\begin{lstlisting}[language=javascript]
+// Declaracion formal nombrada (sufre hoisting)
+function multiplicar(a, b) {
+    return a * b;
+}
+
+// Expresion de funcion anonima asignada a constante
+const sumar = function(a, b) {
+    return a + b;
+};
+\end{lstlisting}
+
+Al ser ciudadanos de primer orden, las funciones pueden pasarse como argumentos a otras funciones (patrón \textbf{Callback}) o retornarse desde ellas:
+\begin{lstlisting}[language=javascript]
+function procesarNumeros(lista, criterio) {
+    for (let i = 0; i < lista.length; i++) {
+        if (criterio(lista[i])) {
+            console.log(lista[i]);
+        }
+    }
+}
+
+function esPar(n) { return n % 2 === 0; }
+procesarNumeros([1, 2, 3, 4, 5, 6], esPar); // Imprime 2, 4, 6
+\end{lstlisting}
+
+\subsubsection{Parámetros Opcionales, por Defecto y Rest}
+En JavaScript, el número de argumentos reales pasados en la invocación no necesita coincidir con el número de parámetros formales declarados en la cabecera:
+\begin{itemize}
+    \item Si se pasan \textbf{menos argumentos}, los parámetros omitidos toman automáticamente el valor \texttt{undefined} (sin provocar error de compilación ni de ejecución).
+    \item Si se pasan \textbf{más argumentos}, los argumentos sobrantes se ignoran de forma transparente.
+\end{itemize}
+
+A partir de ES6 se pueden definir valores por defecto y agrupar parámetros variables mediante el operador Rest (\texttt{...}):
+\begin{lstlisting}[language=javascript]
+// Parametro con valor por defecto
+function formatearTexto(texto, separador = ",") {
+    return texto.split(" ").join(separador);
+}
+
+// Parametro Rest: agrupa los argumentos restantes en un Array real
+function calcularSumaTotal(multiplicador, ...valores) {
+    let suma = 0;
+    for (let v of valores) { suma += v; }
+    return suma * multiplicador;
+}
+\end{lstlisting}
+
+\subsubsection{Ámbito Léxico y Clausuras (Closures)}
+El ámbito de una función en JavaScript se determina estáticamente en el momento en que dicha función se escribe en el código fuente (\textbf{ámbito léxico}), y no en el lugar donde se invoca.
+
+\begin{definicion}{Clausura (Closure)}
+Una \textbf{clausura} es la combinación de una función junto con el entorno léxico en el cual dicha función fue declarada. Esto permite a la función recordar y mantener acceso a las variables externas de su función contenedora, incluso después de que la función contenedora haya finalizado su ejecución y retornado.
+\end{definicion}
+
+A diferencia de las expresiones lambda en Java (donde las variables capturadas del ámbito externo deben ser obligatoriamente \texttt{final} o efectivamente finales), en JavaScript la función retiene una referencia viva a la propia variable. Si la variable externa muta su valor, la función observará el nuevo valor actualizado:
+\begin{lstlisting}[language=javascript]
+let mensaje = "Hola";
+function saludar() {
+    console.log(mensaje);
+}
+saludar(); // Imprime "Hola"
+mensaje = "Adios";
+saludar(); // Imprime "Adios" (acceso vivo por referencia)
+\end{lstlisting}
+
+\subsubsection{Funciones Flecha (Arrow Functions)}
+Introducidas en ES6, las funciones flecha proporcionan una notación extraordinariamente concisa para definir funciones anónimas:
+\begin{lstlisting}[language=javascript]
+// Sintaxis estandar con cuerpo de bloque
+const duplicar = (x) => { return x * 2; };
+
+// Retorno implicito (cuerpo de expresion sin llaves)
+const duplicarConciso = x => x * 2;
+
+// Invocacion directa en callbacks
+let impares = [1, 2, 3, 4, 5].filter(num => num % 2 !== 0);
+\end{lstlisting}
+
+\begin{importante}{Diferencias críticas de las Funciones Flecha}
+Las funciones flecha no son un mero sustituto cosmético de las funciones regulares:
+\begin{enumerate}
+    \item \textbf{No poseen su propio enlace a \texttt{this}:} Capturan el valor de \texttt{this} léxicamente del contexto circundante donde fueron creadas, resolviendo el clásico problema de pérdida de contexto en callbacks de métodos.
+    \item \textbf{No pueden utilizarse como constructores:} Invocar una arrow function con el operador \texttt{new} genera un \texttt{TypeError}.
+    \item \textbf{No disponen del objeto especial \texttt{arguments}.}
+\end{enumerate}
+\end{importante}
+
+\subsection{Programación Orientada a Objetos: Literales y Clases ES6}
+
+\subsubsection{Objetos Literales Dinámicos}
+Un objeto en JavaScript es esencialmente una colección asociativa de pares clave-valor (propiedades) donde las claves son cadenas y los valores pueden ser datos o funciones (métodos). Se crean de manera directa mediante la sintaxis de llaves \texttt{\{\}}:
+\begin{lstlisting}[language=javascript]
+let empleado = {
+    nombre: "Pepe",
+    salario: 1800,
+    // Metodo de instancia
+    obtenerFicha: function() {
+        // En JavaScript el uso de 'this' es OBLIGATORIO para acceder a propiedades
+        return `Empleado: ${this.nombre}, Salario: ${this.salario} EUR`;
+    }
+};
+
+// Acceso mediante notacion de punto
+console.log(empleado.obtenerFicha());
+
+// Mutabilidad dinamica: adicion y modificacion de propiedades en tiempo de ejecucion
+empleado.telefono = "600123456";
+empleado.calcularBono = function() {
+    return this.salario * 0.10;
+};
+\end{lstlisting}
+
+Esta enorme flexibilidad permite la construcción rápida de objetos individuales (\emph{singletons}) y estructuras de datos para transferir información (\emph{Data Transfer Objects} o DTOs).
+
+\subsubsection{Clases Formales en ES6}
+Para estructurar aplicaciones robustas con patrones de diseño orientados a objetos, ES6 introdujo la sintaxis formal de clases, la cual actúa como una capa de azúcar sintáctico sobre el sistema de prototipos subyacente de JavaScript:
+\begin{lstlisting}[language=javascript]
+class Figura {
+    constructor(id, x, y) {
+        this.id = id;
+        this.x = x;
+        this.y = y;
+    }
+
+    desplazar(dx, dy) {
+        this.x += dx;
+        this.y += dy;
+    }
+
+    toString() {
+        return `Figura[${this.id}] en (${this.x}, ${this.y})`;
+    }
+}
+
+// Herencia de clases mediante 'extends' y llamada al constructor padre con 'super()'
+class Rectangulo extends Figura {
+    constructor(id, x, y, ancho, alto) {
+        super(id, x, y); // Invocacion obligatoria al constructor de Figura
+        this.ancho = ancho;
+        this.alto = alto;
+    }
+
+    calcularArea() {
+        return this.ancho * this.alto;
+    }
+
+    // Sobrescritura de metodos (override)
+    toString() {
+        return `Rectangulo > ${super.toString()}, Area: ${this.calcularArea()}`;
+    }
+
+    // Metodos estaticos de factoria o utilidad
+    static crearPorDefecto() {
+        return new Rectangulo("default", 0, 0, 10, 10);
+    }
+}
+\end{lstlisting}
+
+A partir de ECMAScript 2022 se incorporó el soporte para campos y métodos privados reales mediante el prefijo de almohadilla \texttt{\#}:
+\begin{lstlisting}[language=javascript]
+class CuentaBancaria {
+    #saldo; // Campo privado real inaccesible desde el exterior
+
+    constructor(saldoInicial) {
+        this.#saldo = saldoInicial;
+    }
+
+    ingresar(cantidad) {
+        if (cantidad > 0) this.#saldo += cantidad;
+    }
+
+    obtenerSaldo() {
+        return this.#saldo;
+    }
+}
+\end{lstlisting}
+
+En JavaScript no existen interfaces explícitas (\texttt{interface}) como en Java. Dado que el lenguaje es de tipado dinámico, la compatibilidad se fundamenta en el principio de \textbf{Duck Typing}: si un objeto dispone de los métodos y propiedades que el cliente espera consumir, el código opera correctamente con independencia de su jerarquía de herencia.
+
+\subsection{Manejo de Excepciones y Clases de Error Personalizadas}
+
+El control de errores en JavaScript sigue el paradigma de bloques estructurados \texttt{try...catch...finally}. La sentencia \texttt{throw} permite elevar excepciones en cualquier instante:
+\begin{lstlisting}[language=javascript]
+try {
+    if (divisor === 0) {
+        throw new Error("Division por cero no permitida");
+    }
+    let resultado = dividendo / divisor;
+} catch (error) {
+    console.error("Error capturado:", error.message);
+} finally {
+    // Bloque de limpieza que se ejecuta SIEMPRE (se lance o no excepcion)
+    cerrarRecursos();
+}
+\end{lstlisting}
+
+Aunque técnicamente es posible lanzar cualquier valor con \texttt{throw} (incluso números o cadenas de texto como \texttt{throw 'Error fatal'}), en ingeniería de software se exige elevar siempre instancias de la clase nativa \texttt{Error} o derivadas de ella, ya que contienen la traza de la pila de llamadas (\emph{stack trace}) indispensable para la depuración en producción.
+
+\subsubsection{Diseño de jerarquías de errores empresariales}
+En aplicaciones de servidor con Node.js y Express resulta imprescindible modelar errores de negocio enriquecidos con códigos de estado HTTP y banderas de operatividad:
+\begin{lstlisting}[language=javascript]
+// Clase base de error de aplicacion
+export class AppError extends Error {
+    constructor(mensaje, statusCode, esOperacional = true) {
+        super(mensaje);
+        this.name = this.constructor.name;
+        this.statusCode = statusCode;
+        this.esOperacional = esOperacional;
+        // Captura limpia de la traza de pila en entornos V8/Node.js
+        Error.captureStackTrace(this, this.constructor);
+    }
+}
+
+// Error de recurso no encontrado (HTTP 404)
+export class NotFoundError extends AppError {
+    constructor(recurso = "Recurso") {
+        super(`${recurso} no encontrado en el sistema`, 404);
+    }
+}
+
+// Error de validacion de datos de entrada (HTTP 400)
+export class ValidationError extends AppError {
+    constructor(mensaje) {
+        super(mensaje, 400);
+    }
+}
+\end{lstlisting}
+
+\subsection{Ejercicios Resueltos del Bloque 3.1.2}
+
+\begin{ejercicioresuelto}{2}{Clasificación de Pares e Impares en Array Bidimensional}
+\textbf{Enunciado:} Implementar una función \texttt{separarParesImpares(numeros)} que reciba como parámetro un array unidimensional de enteros y retorne un array bidimensional de dos elementos:
+\begin{itemize}
+    \item El primer elemento (\'indice 0) apuntará a un array que contendrá todos los números pares.
+    \item El segundo elemento (\'indice 1) apuntará a un array que contendrá todos los números impares.
+\end{itemize}
+Demostrar su funcionamiento mediante varias llamadas con arrays de prueba.
+
+\textbf{Solución y Análisis:}
+\begin{lstlisting}[language=javascript, caption={Solución del Ejercicio 2}]
+function separarParesImpares(numeros) {
+    const pares = [];
+    const impares = [];
+
+    for (let i = 0; i < numeros.length; i++) {
+        const num = numeros[i];
+        if (num % 2 === 0) {
+            pares.push(num);
+        } else {
+            impares.push(num);
+        }
+    }
+
+    return [pares, impares];
+}
+
+// Pruebas de verificacion
+const muestra1 = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+const resultado1 = separarParesImpares(muestra1);
+console.log("Pares:", resultado1[0]);    // [2, 4, 6, 8, 10]
+console.log("Impares:", resultado1[1]);  // [1, 3, 5, 7, 9]
+
+const muestra2 = [11, 13, 17];
+console.log(separarParesImpares(muestra2)); // [[], [11, 13, 17]]
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\begin{ejercicioresuelto}{3}{Eliminación de Ceros y Ordenación por Longitud de Filas}
+\textbf{Enunciado:} Implementar una función \texttt{limpiarCerosYOrdenar(matriz)} que reciba un array bidimensional (matriz), elimine de cada fila todos los ceros presentes y ordene las filas resultantes de menor a mayor en función de su longitud, utilizando el algoritmo de ordenación de la burbuja (\emph{Bubble Sort}).
+
+\textbf{Solución y Análisis:}
+\begin{lstlisting}[language=javascript, caption={Solución del Ejercicio 3}]
+function limpiarCerosYOrdenar(matriz) {
+    // 1. Crear una copia profunda de las filas eliminando ceros
+    const matrizFiltrada = [];
+    for (let i = 0; i < matriz.length; i++) {
+        const filaLimpia = [];
+        for (let j = 0; j < matriz[i].length; j++) {
+            if (matriz[i][j] !== 0) {
+                filaLimpia.push(matriz[i][j]);
+            }
+        }
+        matrizFiltrada.push(filaLimpia);
+    }
+
+    // 2. Ordenacion por tamano de fila mediante Bubble Sort adaptado
+    const n = matrizFiltrada.length;
+    for (let i = 0; i < n - 1; i++) {
+        for (let j = 0; j < n - i - 1; j++) {
+            if (matrizFiltrada[j].length > matrizFiltrada[j + 1].length) {
+                // Intercambio de referencias de filas
+                const temp = matrizFiltrada[j];
+                matrizFiltrada[j] = matrizFiltrada[j + 1];
+                matrizFiltrada[j + 1] = temp;
+            }
+        }
+    }
+
+    return matrizFiltrada;
+}
+
+// Demostracion
+const datos = [
+    [0, 5, 0, 8, 0, 2], // 3 elementos tras filtrar
+    [1, 0, 0],          // 1 elemento tras filtrar
+    [0, 0, 0, 0],       // 0 elementos tras filtrar
+    [4, 7, 9, 3]        // 4 elementos tras filtrar
+];
+
+const resultado = limpiarCerosYOrdenar(datos);
+console.log("Matriz procesada:", resultado);
+// Salida esperada ordenada por longitud:
+// [ [], [1], [5, 8, 2], [4, 7, 9, 3] ]
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\begin{ejercicioresuelto}{4}{Filtrado Configurable con Callbacks y Arrow Functions}
+\textbf{Enunciado:} Refactorizar el Ejercicio 3 para que el criterio de descarte de números no sea exclusivamente el cero, sino que sea configurable por el llamador mediante una función de predicado pasada como parámetro (\texttt{debeEliminar}). Demostrar el uso de \emph{arrow functions} en las llamadas de prueba.
+
+\textbf{Solución y Análisis:}
+\begin{lstlisting}[language=javascript, caption={Solución del Ejercicio 4}]
+function filtrarYOrdenar(matriz, debeEliminar) {
+    const filtrada = [];
+    for (let fila of matriz) {
+        const nuevaFila = [];
+        for (let val of fila) {
+            // Si el predicado no se cumple, conservamos el valor
+            if (!debeEliminar(val)) {
+                nuevaFila.push(val);
+            }
+        }
+        filtrada.push(nuevaFila);
+    }
+
+    // Ordenacion utilizando el metodo nativo .sort con comparator
+    filtrada.sort((a, b) => a.length - b.length);
+    return filtrada;
+}
+
+const matrizPrueba = [
+    [-5, 10, -2, 8],
+    [15, -1, 30],
+    [-8, -9, -10]
+];
+
+// Prueba A: Eliminar todos los numeros negativos
+const sinNegativos = filtrarYOrdenar(matrizPrueba, n => n < 0);
+console.log("Sin negativos:", sinNegativos);
+
+// Prueba B: Eliminar numeros impares
+const sinImpares = filtrarYOrdenar(matrizPrueba, n => n % 2 !== 0);
+console.log("Sin impares:", sinImpares);
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\begin{ejercicioresuelto}{5}{Modelado de Rectángulos y Análisis de Colecciones (5, 5b, 6, 7 y 8)}
+\textbf{Enunciado:} 
+\begin{enumerate}
+    \item Diseñar una jerarquía de clases con una clase base abstracta simulada \texttt{Shape} y clases derivadas \texttt{Rectangle} (ancho, alto) y \texttt{Circle} (radio). Cada figura debe implementar \texttt{area()} y \texttt{perimeter()}.
+    \item Implementar una clase \texttt{ShapeAnalyzer} capaz de recibir una colección de figuras y calcular: suma total de áreas, suma de perímetros, área media, perímetro medio, y la media del ratio área/perímetro de todas las figuras.
+    \item Incorporar manejo robusto de excepciones (Ejercicio 8): impedir la instanciación directa de \texttt{Shape}, impedir dimensiones negativas o no numéricas (\texttt{isNaN}), y elevar errores personalizados.
+\end{enumerate}
+
+\textbf{Solución y Análisis:}
+\begin{lstlisting}[language=javascript, caption={Jerarquía completa de Figuras con Manejo de Errores y Analizador}]
+// Error de dominio personalizado
+class InvalidDimensionError extends Error {
+    constructor(mensaje) {
+        super(mensaje);
+        this.name = "InvalidDimensionError";
+    }
+}
+
+// Clase base abstracta
+class Shape {
+    constructor(color = "negro") {
+        if (new.target === Shape) {
+            throw new Error("No se puede instanciar directamente la clase abstracta Shape.");
+        }
+        this.color = color;
+    }
+
+    area() {
+        throw new Error("El metodo area() debe ser implementado por la subclase.");
+    }
+
+    perimeter() {
+        throw new Error("El metodo perimeter() debe ser implementado por la subclase.");
+    }
+
+    areaPerimeterRatio() {
+        const perim = this.perimeter();
+        if (perim === 0) return 0;
+        return this.area() / perim;
+    }
+}
+
+class Rectangle extends Shape {
+    constructor(width, height, color = "azul") {
+        super(color);
+        this.#validarDimension(width, "ancho");
+        this.#validarDimension(height, "alto");
+        this.width = width;
+        this.height = height;
+    }
+
+    #validarDimension(val, nombre) {
+        if (typeof val !== "number" || isNaN(val) || val <= 0) {
+            throw new InvalidDimensionError(`El valor de ${nombre} debe ser un numero positivo (> 0). Recibido: ${val}`);
+        }
+    }
+
+    area() { return this.width * this.height; }
+    perimeter() { return 2 * (this.width + this.height); }
+}
+
+class Circle extends Shape {
+    constructor(radius, color = "rojo") {
+        super(color);
+        if (typeof radius !== "number" || isNaN(radius) || radius <= 0) {
+            throw new InvalidDimensionError(`El radio debe ser un numero positivo. Recibido: ${radius}`);
+        }
+        this.radius = radius;
+    }
+
+    area() { return Math.PI * this.radius * this.radius; }
+    perimeter() { return 2 * Math.PI * this.radius; }
+}
+
+class ShapeAnalyzer {
+    constructor(shapes = []) {
+        this.shapes = shapes;
+    }
+
+    addShape(shape) {
+        if (!(shape instanceof Shape)) {
+            throw new TypeError("Solo se pueden agregar instancias derivadas de Shape.");
+        }
+        this.shapes.push(shape);
+    }
+
+    totalArea() {
+        return this.shapes.reduce((acc, s) => acc + s.area(), 0);
+    }
+
+    totalPerimeter() {
+        return this.shapes.reduce((acc, s) => acc + s.perimeter(), 0);
+    }
+
+    averageArea() {
+        return this.shapes.length === 0 ? 0 : this.totalArea() / this.shapes.length;
+    }
+
+    averagePerimeter() {
+        return this.shapes.length === 0 ? 0 : this.totalPerimeter() / this.shapes.length;
+    }
+
+    averageRatio() {
+        if (this.shapes.length === 0) return 0;
+        const sumRatios = this.shapes.reduce((acc, s) => acc + s.areaPerimeterRatio(), 0);
+        return sumRatios / this.shapes.length;
+    }
+}
+
+// Verificacion y captura de excepciones
+try {
+    const analyzer = new ShapeAnalyzer();
+    analyzer.addShape(new Rectangle(10, 5));
+    analyzer.addShape(new Rectangle(20, 10));
+    analyzer.addShape(new Circle(7));
+
+    console.log(`Area Total: ${analyzer.totalArea().toFixed(2)}`);
+    console.log(`Perimetro Total: ${analyzer.totalPerimeter().toFixed(2)}`);
+    console.log(`Area Media: ${analyzer.averageArea().toFixed(2)}`);
+    console.log(`Ratio Medio A/P: ${analyzer.averageRatio().toFixed(2)}`);
+
+    // Prueba de validacion
+    new Rectangle(-5, 10); // Provoca excepcion
+} catch (error) {
+    console.error("Excepcion capturada con exito:", error.name, "-", error.message);
+}
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\section{Estructuras de Datos en JavaScript (3.1.3)}
+
+\subsection{Almacenamiento en Memoria y Complejidad Algorítmica}
+
+A partir de la especificación ECMAScript 2015 (ES6), la API estándar de JavaScript incorpora tres estructuras de datos fundamentales en memoria: \textbf{Array}, \textbf{Set} y \textbf{Map}. La elección juiciosa de la estructura adecuada determina la escalabilidad y el rendimiento computacional de las aplicaciones web en el servidor:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{2.8cm} X X X}
+\toprule
+\textbf{Propiedad} & \textbf{Array} & \textbf{Set} & \textbf{Map} \\
+\midrule
+\textbf{Elementos} & Secuencia indexada. Permite duplicados. & Colección de valores únicos. Sin duplicados. & Pares clave-valor. Claves únicas de cualquier tipo. \\
+\addlinespace
+\textbf{Acceso por Posición} & Eficiente $O(1)$ mediante \texttt{arr[i]}. & No soportado. & No soportado. \\
+\addlinespace
+\textbf{Inserción} & Final: $O(1)$ amortizado (\texttt{push}). Inicio/Centro: $O(n)$ (\texttt{unshift}, \texttt{splice}). & Eficiente $O(1)$ promedio (\texttt{add}). & Eficiente $O(1)$ promedio (\texttt{set}). \\
+\addlinespace
+\textbf{Eliminación} & Final: $O(1)$ (\texttt{pop}). Centro: $O(n)$ (\texttt{splice}). & Eficiente $O(1)$ promedio (\texttt{delete}). & Eficiente $O(1)$ promedio (\texttt{delete}). \\
+\addlinespace
+\textbf{Búsqueda} & Ineficiente $O(n)$ (\texttt{indexOf}, \texttt{find}). & Ultra-eficiente $O(1)$ promedio (\texttt{has}). & Ultra-eficiente $O(1)$ promedio (\texttt{get}, \texttt{has}). \\
+\addlinespace
+\textbf{Propiedad de Tamaño} & \texttt{.length} (mutable). & \texttt{.size} (solo lectura). & \texttt{.size} (solo lectura). \\
+\bottomrule
+\end{tabularx}
+\caption{Comparativa de complejidad temporal y características de estructuras de datos en JavaScript.}
+\label{tab:estructuras-datos}
+\end{table}
+
+\subsection{Conjuntos (\texttt{Set})}
+
+Un \texttt{Set} es una colección de valores donde cada elemento puede aparecer una única vez. 
+
+\begin{itemize}
+    \item \textbf{Criterio de Igualdad:} Para determinar si un elemento es duplicado, el \texttt{Set} utiliza internamente una variante del operador de igualdad estricta (\texttt{===}). En consecuencia:
+    \begin{itemize}
+        \item Las cadenas de texto con los mismos caracteres son consideradas idénticas (\texttt{'Madrid' === 'Madrid'}).
+        \item Dos objetos con las mismas propiedades pero creados de forma independiente son referencias de memoria distintas y \textbf{no se consideran duplicados} (\texttt{\{ id: 1 \} !== \{ id: 1 \}}).
+    \end{itemize}
+    \item \textbf{Operaciones Básicas:}
+\begin{lstlisting}[language=javascript]
+const coleccion = new Set();
+coleccion.add(10).add(20).add(10); // add es encadenable. El segundo 10 se ignora
+console.log(coleccion.size); // 2
+console.log(coleccion.has(20)); // true (busqueda O(1))
+coleccion.delete(20); // Borra el elemento y devuelve true
+\end{lstlisting}
+    \item \textbf{Interoperabilidad con Arrays:}
+\begin{lstlisting}[language=javascript]
+// Eliminacion instantanea de duplicados en un Array:
+const repetidos = ['Madrid', 'Sevilla', 'Madrid', 'Bilbao'];
+const unicos = [...new Set(repetidos)]; // ['Madrid', 'Sevilla', 'Bilbao']
+\end{lstlisting}
+\end{itemize}
+
+\subsection{Mapas (\texttt{Map})}
+
+Un \texttt{Map} asocia claves arbitrarias con valores. A diferencia de los objetos literales comunes \texttt{\{\}}, donde las claves se convierten forzosamente a cadenas de texto o símbolos:
+\begin{enumerate}
+    \item En un \texttt{Map}, las claves pueden ser de cualquier tipo de dato, incluyendo objetos, funciones o tipos primitivos.
+    \item Respeta estrictamente el orden de inserción de las entradas al iterar.
+    \item Dispone de la propiedad directa \texttt{.size}.
+    \item Presenta un rendimiento notablemente superior en escenarios de inserción y borrado intensivo frecuente de pares clave-valor.
+\end{enumerate}
+
+\begin{lstlisting}[language=javascript]
+const coches = new Map();
+coches.set('1234-ABC', { marca: 'Seat', modelo: 'Leon' });
+coches.set('5678-XYZ', { marca: 'Toyota', modelo: 'Corolla' });
+
+// Recuperacion por clave O(1)
+const c = coches.get('1234-ABC');
+console.log(coches.has('9999-ZZZ')); // false
+coches.delete('1234-ABC');
+\end{lstlisting}
+
+\subsection{Patrones de Recorrido e Iteración}
+
+Para recorrer colecciones en JavaScript disponemos de múltiples mecanismos:
+\begin{itemize}
+    \item \textbf{Bucle \texttt{for...of}:} El estándar preferido para iterar sobre cualquier objeto iterable (Arrays, Sets, Maps, strings):
+\begin{lstlisting}[language=javascript]
+// Recorrido de Set
+for (const ciudad of setCiudades) { console.log(ciudad); }
+
+// Recorrido de Map mediante desestructuracion [clave, valor]
+for (const [matricula, vehiculo] of coches) {
+    console.log(matricula, "->", vehiculo.modelo);
+}
+\end{lstlisting}
+    \item \textbf{Métodos Funcionales de Iteración:} \texttt{forEach(callback)} permite ejecutar una función por cada elemento.
+    \item \textbf{Métodos de Transformación de Arrays:}
+    \begin{itemize}
+        \item \texttt{.map(fn)}: Genera un nuevo array transformando cada elemento.
+        \item \texttt{.filter(predicado)}: Genera un nuevo array con los elementos que satisfacen la condición booleana.
+        \item \texttt{.reduce(acumuladorFn, valorInicial)}: Reduce todos los elementos a un único valor acumulado (sumatorios, medias, agrupaciones).
+    \end{itemize}
+\end{itemize}
+
+\subsection{Ordenación y Búsqueda}
+
+En JavaScript, únicamente los \textbf{Arrays} son susceptibles de ser ordenados mediante el método nativo \texttt{.sort()}.
+
+\begin{importante}{La trampa de \texttt{.sort()} sin comparador}
+Por defecto, \texttt{array.sort()} convierte todos los elementos a cadenas de texto y los ordena lexicográficamente según su valor Unicode. Esto produce errores críticos al ordenar números:
+\begin{lstlisting}[language=javascript]
+const numeros = [25, 8, 7, 100];
+numeros.sort();
+console.log(numeros); // [100, 25, 7, 8]  (¡ERROR! '100' va antes que '25' alfabeticamente)
+\end{lstlisting}
+Para ordenar números o comparar propiedades de objetos, es \textbf{estrictamente obligatorio suministrar una función de comparación} \texttt{(a, b) => valor}:
+\begin{itemize}
+    \item Si devuelve un valor negativo ($< 0$), \texttt{a} se sitúa antes que \texttt{b}.
+    \item Si devuelve cero ($0$), su orden relativo se mantiene.
+    \item Si devuelve un valor positivo ($> 0$), \texttt{b} se sitúa antes que \texttt{a}.
+\end{itemize}
+\begin{lstlisting}[language=javascript]
+// Ordenacion numerica ascendente correcta:
+numeros.sort((a, b) => a - b); // [7, 8, 25, 100]
+
+// Ordenacion de objetos por longitud de cadena:
+const nombres = ['Alejandro', 'Ana', 'Constantino', 'Eva'];
+nombres.sort((s1, s2) => s1.length - s2.length);
+\end{lstlisting}
+\end{importante}
+
+\subsection{Ejercicios Resueltos del Bloque 3.1.3}
+
+\begin{ejercicioresuelto}{1}{Función \texttt{countDistinct} con \texttt{Set}}
+\textbf{Enunciado:} Implementar una función \texttt{countDistinct(provincias)} que reciba un array de cadenas con nombres de provincias (posiblemente repetidas) y devuelva el número exacto de provincias únicas sin duplicados. Probar la función con un array de ejemplo.
+
+\textbf{Solución y Análisis:}
+\begin{lstlisting}[language=javascript, caption={Solución del Ejercicio 1 de Estructuras de Datos}]
+function countDistinct(provincias) {
+    // Al instanciar un Set con un Array, se eliminan todos los duplicados en O(n)
+    const conjuntoUnicos = new Set(provincias);
+    return conjuntoUnicos.size;
+}
+
+const lista = [
+    "Madrid", "Barcelona", "Madrid", "Valencia", 
+    "Sevilla", "Barcelona", "Zaragoza", "Madrid"
+];
+
+console.log("Total provincias en lista:", lista.length); // 8
+console.log("Provincias sin repetir:", countDistinct(lista)); // 5
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\begin{ejercicioresuelto}{2}{Gestión Eficiente de Aeropuertos con \texttt{AirportManager}}
+\textbf{Enunciado:} Implementar una clase \texttt{AirportManager} para almacenar aeropuertos (cada uno con nombre y ciudad). Se exige poder consultar la información completa de cualquier aeropuerto por su nombre con la máxima eficiencia temporal posible. Seleccionar la estructura de datos óptima y validar el funcionamiento.
+
+\textbf{Solución y Análisis:}
+Para garantizar un tiempo de búsqueda $O(1)$ amortizado frente al nombre del aeropuerto, la estructura de datos obligatoria es un \textbf{\texttt{Map}}, donde la clave es el nombre del aeropuerto y el valor es el objeto completo:
+\begin{lstlisting}[language=javascript, caption={Solución del Ejercicio 2 de Estructuras de Datos}]
+class Airport {
+    constructor(name, city) {
+        this.name = name;
+        this.city = city;
+    }
+}
+
+class AirportManager {
+    constructor() {
+        // Mapa asociativo: Clave = name (String), Valor = Airport
+        this.airports = new Map();
+    }
+
+    addAirport(airport) {
+        this.airports.set(airport.name, airport);
+    }
+
+    getAirport(name) {
+        // Acceso directo O(1)
+        return this.airports.get(name);
+    }
+}
+
+// Pruebas
+const manager = new AirportManager();
+manager.addAirport(new Airport("Barajas", "Madrid"));
+manager.addAirport(new Airport("El Prat", "Barcelona"));
+manager.addAirport(new Airport("Manises", "Valencia"));
+
+console.log(manager.getAirport("Barajas")); // Airport { name: 'Barajas', city: 'Madrid' }
+console.log(manager.getAirport("Inexistente")); // undefined
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\begin{ejercicioresuelto}{3}{Gestor de Vuelos \texttt{TripManager} con Índices Multi-Estructura}
+\textbf{Enunciado:} Diseñar una clase \texttt{TripManager} para gestionar en memoria un conjunto de viajes de una aerolínea (origen, destino y duración). El gestor debe proveer las siguientes consultas en el mínimo tiempo de ejecución posible:
+\begin{enumerate}
+    \item Devolver todos los viajes que parten de una ciudad origen dada.
+    \item Devolver todos los viajes que llegan a una ciudad destino dada.
+    \item Devolver la lista completa de todos los viajes.
+    \item Devolver la lista sin duplicados de todas las ciudades conectadas por algún viaje.
+\end{enumerate}
+
+\textbf{Solución y Análisis:}
+Para lograr consultas en tiempo $O(1)$ sin realizar recorridos secuenciales $O(n)$, empleamos una técnica clásica de bases de datos: \textbf{indexación mediante múltiples estructuras en memoria}:
+\begin{lstlisting}[language=javascript, caption={Solución del Ejercicio 3 de Estructuras de Datos}]
+class Trip {
+    constructor(origin, destination, duration) {
+        this.origin = origin;
+        this.destination = destination;
+        this.duration = duration;
+    }
+}
+
+class TripManager {
+    constructor() {
+        this.allTrips = []; // Lista completa
+        this.tripsByOrigin = new Map(); // Indice: origen -> Array<Trip>
+        this.tripsByDestination = new Map(); // Indice: destino -> Array<Trip>
+        this.cities = new Set(); // Conjunto de ciudades unicas
+    }
+
+    addTrip(trip) {
+        this.allTrips.push(trip);
+
+        // Actualizar indice de origenes
+        if (!this.tripsByOrigin.has(trip.origin)) {
+            this.tripsByOrigin.set(trip.origin, []);
+        }
+        this.tripsByOrigin.get(trip.origin).push(trip);
+
+        // Actualizar indice de destinos
+        if (!this.tripsByDestination.has(trip.destination)) {
+            this.tripsByDestination.set(trip.destination, []);
+        }
+        this.tripsByDestination.get(trip.destination).push(trip);
+
+        // Registrar ciudades en el conjunto
+        this.cities.add(trip.origin);
+        this.cities.add(trip.destination);
+    }
+
+    getTripsByOrigin(origin) {
+        // Retorno inmediato en O(1)
+        return this.tripsByOrigin.get(origin) || [];
+    }
+
+    getTripsByDestination(destination) {
+        // Retorno inmediato en O(1)
+        return this.tripsByDestination.get(destination) || [];
+    }
+
+    getAllTrips() {
+        return this.allTrips;
+    }
+
+    getAllCities() {
+        // Conversion de Set a Array
+        return [...this.cities];
+    }
+}
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\section{Modularidad en JavaScript: ESM y Node.js (3.1.4 y 3.1.5)}
+
+\subsection{Principios de Modularidad y ECMAScript Modules (ESM)}
+
+El desarrollo de sistemas de software a escala empresarial exige descomponer las aplicaciones en piezas cohesivas e independientes denominadas \textbf{módulos}. La modularización ofrece tres beneficios directos:
+\begin{enumerate}
+    \item \textbf{Encapsulación y Ocultamiento de Información:} Cada archivo tiene su propio ámbito privado. Solo los identificadores declarados con \texttt{export} son visibles fuera del archivo.
+    \item \textbf{Mantenibilidad y Prevención de Colisiones de Nombres:} Se erradica por completo la contaminación del objeto global.
+    \item \textbf{Reutilización de Código:} Funcionalidades transversales pueden compartirse entre distintos subsistemas.
+\end{enumerate}
+
+El estándar oficial de la industria se denomina \textbf{ECMAScript Modules (ESM)}.
+
+\subsubsection{Mecanismos de Exportación}
+\begin{itemize}
+    \item \textbf{Exportación por Defecto (\texttt{export default}):} Un módulo puede designar un único valor o función como exportación principal. Al importar, el receptor puede nombrarlo libremente sin llaves:
+\begin{lstlisting}[language=javascript]
+// En logger.js
+export default function log(msg) { console.log(`[INFO] ${msg}`); }
+
+// En app.js
+import miLogger from './logger.js';
+miLogger("Servidor iniciado");
+\end{lstlisting}
+    \item \textbf{Exportaciones Nombradas (\texttt{export const/function}):} Permite exportar múltiples entidades individuales desde el mismo archivo:
+\begin{lstlisting}[language=javascript]
+// En mathUtils.js
+export const PI = 3.14159;
+export function sumar(a, b) { return a + b; }
+export class Calculadora { ... }
+
+// Importacion selectiva desestructurada mediante llaves:
+import { PI, sumar } from './mathUtils.js';
+
+// Importacion de espacio de nombres completo (Namespace Import):
+import * as MathUtils from './mathUtils.js';
+console.log(MathUtils.sumar(2, 3));
+\end{lstlisting}
+\end{itemize}
+
+\subsubsection{ESM en el Navegador y en Node.js}
+\begin{itemize}
+    \item \textbf{En el Navegador:} Se debe indicar explícitamente el atributo \texttt{type='module'} en la etiqueta \texttt{<script>}:
+\begin{lstlisting}[language=html]
+<script type="module" src="app.js"></script>
+\end{lstlisting}
+    \begin{importante}{Restricción de Seguridad en el Navegador}
+    Los módulos en el navegador se rigen por la política de seguridad CORS. Cargar un módulo mediante el protocolo local de archivos (\texttt{file:///}) falla por seguridad. Es \textbf{estrictamente necesario servir el archivo mediante un servidor HTTP local} (\texttt{http://localhost:...}).
+    \end{importante}
+    \item \textbf{En Node.js:} Para activar el sistema ESM en un proyecto Node, se debe configurar el archivo \texttt{package.json} incorporando la clave \texttt{'type': 'module'}:
+\begin{lstlisting}[language=json]
+{
+  "name": "mi-proyecto-web",
+  "version": "1.0.0",
+  "type": "module"
+}
+\end{lstlisting}
+\end{itemize}
+
+\subsection{Módulos Nativos de Node.js y el Prefijo \texttt{node:}}
+
+Node.js proporciona de fábrica una rica biblioteca de módulos del sistema. A partir de versiones recientes, las mejores prácticas de ingeniería exigen anteponer el prefijo \textbf{\texttt{node:}} al importar módulos del núcleo, lo que evita colisiones con paquetes instalados desde npm y acelera la resolución interna del runtime:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{3.2cm} X}
+\toprule
+\textbf{Módulo del Núcleo} & \textbf{Funcionalidad y Responsabilidad en el Sistema} \\
+\midrule
+\texttt{node:fs} / \texttt{node:fs/promises} & Operaciones sobre el sistema de archivos: lectura, escritura, creación y borrado de directorios de forma asíncrona mediante promesas. \\
+\addlinespace
+\texttt{node:path} & Construcción, normalización y resolución segura de rutas de archivos en sistemas operativos heterogéneos (manejo de separadores \texttt{/} en Linux/macOS vs \texttt{\textbackslash} en Windows). \\
+\addlinespace
+\texttt{node:http} / \texttt{node:https} & Creación de servidores y clientes HTTP/HTTPS de bajo nivel sobre sockets TCP. \\
+\addlinespace
+\texttt{node:events} & Implementación del patrón Observer mediante la clase central \texttt{EventEmitter}. \\
+\addlinespace
+\texttt{node:crypto} & Criptografía avanzada: funciones hash (SHA-256), cifrado simétrico/asimétrico, firmas digitales y generación de tokens criptográficos aleatorios seguros. \\
+\addlinespace
+\texttt{node:process} & Control e información del proceso en ejecución: lectura de variables de entorno (\texttt{process.env}), gestión de señales POSIX (\texttt{SIGTERM}, \texttt{SIGINT}) y salida controlada (\texttt{process.exit}). \\
+\bottomrule
+\end{tabularx}
+\caption{Principales módulos nativos incluidos en el entorno de ejecución de Node.js.}
+\label{tab:node-core-modules}
+\end{table}
+
+Ejemplo de lectura asíncrona de archivos con soporte moderno de \emph{Top-Level Await}:
+\begin{lstlisting}[language=javascript]
+import { readFile } from 'node:fs/promises';
+
+try {
+    const contenido = await readFile('./config.json', 'utf8');
+    const configuracion = JSON.parse(contenido);
+    console.log("Configuracion cargada:", configuracion);
+} catch (error) {
+    console.error("Error al leer el archivo:", error.message);
+}
+\end{lstlisting}
+
+\subsection{Gestión de Paquetes con npm y Coexistencia con CommonJS}
+
+El ecosistema de Node.js se articula en torno a \textbf{npm} (\emph{Node Package Manager}), el registro público de software libre más grande del mundo.
+
+\begin{itemize}
+    \item \textbf{\texttt{package.json}:} Archivo descriptor del proyecto que define metadatos, comandos ejecutables en la sección \texttt{'scripts'} y las dependencias de la aplicación.
+    \item \textbf{Instalación de Dependencias:}
+    \begin{itemize}
+        \item \texttt{npm install --save <paquete>}: Instala una biblioteca necesaria para la ejecución en producción (se registra en \texttt{dependencies}).
+        \item \texttt{npm install --save-dev <paquete>}: Instala herramientas utilizadas exclusivamente durante la fase de desarrollo, como \texttt{nodemon} para recarga en caliente o linters (se registra en \texttt{devDependencies}).
+    \end{itemize}
+    \item \textbf{La carpeta \texttt{node\_modules}:} Contiene el código fuente descargado de todas las dependencias directas e indirectas. \textbf{Nunca debe subirse al repositorio Git}; debe figurar obligatoriamente en el archivo \texttt{.gitignore}, ya que puede reproducirse en cualquier momento ejecutando \texttt{npm install} a partir de \texttt{package.json} y el archivo de bloqueo determinista \texttt{package-lock.json}.
+    \item \textbf{Versionado Semántico (SemVer):} Los paquetes utilizan el estándar \texttt{MAJOR.MINOR.PATCH}. El prefijo \texttt{\^{}1.2.3} permite actualizaciones de versiones menores y parches compatibles; el prefijo \texttt{\~{}1.2.3} permite únicamente parches de corrección.
+\end{itemize}
+
+\subsubsection{Transición Histórica: CommonJS vs ESM}
+Con anterioridad a la estandarización de ESM, Node.js utilizaba su propio sistema modular propietario: \textbf{CommonJS} (basado en las funciones síncronas \texttt{require()} y \texttt{module.exports}). Ambos sistemas coexisten actualmente en el ecosistema:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{4.2cm} X X}
+\toprule
+\textbf{Operación} & \textbf{CommonJS (Legado)} & \textbf{ESM (Estándar Moderno)} \\
+\midrule
+Importar módulo completo & \texttt{const fs = require('fs');} & \texttt{import fs from 'node:fs';} \\
+Importar elemento con nombre & \texttt{const \{ readFile \} = require('fs');} & \texttt{import \{ readFile \} from 'node:fs';} \\
+Exportar valor único por defecto & \texttt{module.exports = miFuncion;} & \texttt{export default miFuncion;} \\
+Exportar múltiples elementos & \texttt{exports.suma = suma;} & \texttt{export const suma = ...;} \\
+\bottomrule
+\end{tabularx}
+\caption{Equivalencias sintácticas entre CommonJS y ES Modules.}
+\label{tab:commonjs-vs-esm}
+\end{table}
+
+\subsection{Ejercicios Resueltos del Bloque 3.1.4 y 3.1.5}
+
+\begin{ejercicioresuelto}{1}{Modularización de Funciones y Consumo con ESM}
+\textbf{Enunciado:} Extraer la función de eliminar ceros desarrollada en ejercicios previos a un módulo independiente denominado \texttt{arrayCleaner.js}. Exportar dicha función como valor por defecto e importarla en \texttt{app.js} para procesar un array de prueba.
+
+\textbf{Solución y Análisis:}
+
+Creamos el módulo \texttt{arrayCleaner.js}:
+\begin{lstlisting}[language=javascript, caption={arrayCleaner.js}]
+export default function eliminarCeros(array) {
+    return array.filter(elemento => elemento !== 0);
+}
+\end{lstlisting}
+
+Y el punto de entrada de la aplicación \texttt{app.js}:
+\begin{lstlisting}[language=javascript, caption={app.js con importacion ESM}]
+import eliminarCeros from './arrayCleaner.js';
+
+const datosBrutos = [0, 10, 0, 25, 0, 0, 42, 99];
+const datosLimpios = eliminarCeros(datosBrutos);
+
+console.log("Original:", datosBrutos);
+console.log("Filtrado:", datosLimpios); // [10, 25, 42, 99]
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\begin{ejercicioresuelto}{2}{Uso de Bibliotecas Externas con npm: \texttt{lodash}}
+\textbf{Enunciado:} Instalar la biblioteca de utilidades \texttt{lodash} en el proyecto e implementar un script que emplee el método \texttt{\_.without()} para eliminar ceros y valores no deseados de un array.
+
+\textbf{Solución y Análisis:}
+
+Paso 1: Inicialización del proyecto e instalación de dependencias en consola:
+\begin{lstlisting}[language=bash]
+$ npm init -y
+$ npm install --save lodash
+\end{lstlisting}
+
+Paso 2: Código del script \texttt{app.js}:
+\begin{lstlisting}[language=javascript, caption={app.js utilizando lodash}]
+import _ from 'lodash';
+
+const numeros = [0, 4, 0, 9, 12, 0, 5, 0];
+
+// _.without crea un array nuevo excluyendo todos los valores proporcionados
+const sinCeros = _.without(numeros, 0);
+console.log("Array sin ceros mediante lodash:", sinCeros); // [4, 9, 12, 5]
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\section{Aplicaciones Web con Node.js y Express (3.2.1)}
+
+\subsection{Arquitectura de Express y Pipeline de Middlewares}
+
+Para la construcción de servicios web robustos y mantenibles no se suele interactuar directamente con el módulo nativo \texttt{node:http}, sino que se recurre a frameworks de servidor. El estándar \emph{de facto} indiscutible en el ecosistema Node.js es \textbf{Express}.
+
+\begin{definicion}{Framework Express}
+\textbf{Express} es un framework web minimalista, rápido y flexible que proporciona un conjunto robusto de utilidades para:
+\begin{itemize}
+    \item El enrutamiento de peticiones HTTP en base a verbos (\texttt{GET}, \texttt{POST}, etc.) y patrones de URL.
+    \item La orquestación secuencial de funciones intermediarias (\textbf{Middlewares}).
+    \item La integración transparente con motores de renderizado de plantillas HTML en servidor (SSR).
+\end{itemize}
+\end{definicion}
+
+El núcleo arquitectónico de Express se fundamenta en la cadena de responsabilidad o \textbf{Pipeline de Middlewares}. Cada middleware es una función que tiene acceso al objeto de petición (\texttt{req}), al objeto de respuesta (\texttt{res}) y a la siguiente función middleware de la pila mediante la función \texttt{next()}:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=1.2cm,
+    stepbox/.style={rectangle, draw=primary, fill=bglight, thick, minimum width=3.8cm, minimum height=0.9cm, align=center, rounded corners=3pt},
+    endpoint/.style={rectangle, draw=secondary, fill=secondary!15, thick, minimum width=3.8cm, minimum height=0.9cm, align=center, rounded corners=3pt, font=\bfseries},
+    arrow/.style={-Latex, thick, color=primary}
+]
+    \node[stepbox] (req) {Petición HTTP Entrante\\(Headers, Path, Body)};
+    \node[stepbox, below of=req] (m1) {Middleware 1: \texttt{express.static}\\(Archivos Estáticos)};
+    \node[stepbox, below of=m1] (m2) {Middleware 2: \texttt{urlencoded}\\(Parseo de Formularios)};
+    \node[stepbox, below of=m2] (m3) {Middleware 3: \texttt{defaultModel}\\(Datos Globales)};
+    \node[endpoint, below of=m3] (route) {Controlador de Ruta\\(\texttt{router.get} / \texttt{router.post})};
+    \node[stepbox, below of=route] (res) {Respuesta HTTP\\(\texttt{res.render} / \texttt{res.redirect})};
+
+    \draw[arrow] (req) -- (m1);
+    \draw[arrow] (m1) -- node[right, font=\scriptsize\ttfamily] {next()} (m2);
+    \draw[arrow] (m2) -- node[right, font=\scriptsize\ttfamily] {next()} (m3);
+    \draw[arrow] (m3) -- node[right, font=\scriptsize\ttfamily] {next()} (route);
+    \draw[arrow] (route) -- (res);
+\end{tikzpicture}
+\caption{Flujo de procesamiento secuencial a través de la cadena de Middlewares en Express.}
+\label{fig:express-pipeline}
+\end{figure}
+
+\subsection{Estructura Profesional de un Proyecto Express}
+
+En aplicaciones que siguen las buenas prácticas de ingeniería de software, la configuración general del servidor se desacopla estrictamente de la lógica de enrutamiento y los modelos de negocio. La estructura canónica del proyecto organiza los directorios de la siguiente forma:
+
+\begin{lstlisting}[language=bash]
+proyecto-express/
+|-- package.json          # Metadatos, dependencias y scripts de ejecucion
+|-- public/               # Archivos estaticos servidos directamente por HTTP
+|   |-- css/styles.css
+|   |-- img/logo.png
+|-- src/                  # Codigo fuente de la logica de backend
+|   |-- app.js            # Configuracion e inicializacion de middlewares y servidor
+|   |-- router.js         # Definicion de rutas y controladores HTTP
+|   |-- board.js          # Logica del dominio y acceso a datos
+|-- views/                # Plantillas dinamicas HTML (Mustache)
+|   |-- index.html
+|   |-- header.html
+|   |-- footer.html
+\end{lstlisting}
+
+\subsubsection{Inicialización y configuración en \texttt{src/app.js}}
+\begin{lstlisting}[language=javascript, caption={src/app.js: Configuración integral de Express}]
+import express from 'express';
+import mustacheExpress from 'mustache-express';
+import router from './router.js';
+
+const app = express();
+
+// 1. Servicio de archivos estaticos desde el directorio /public
+app.use(express.static('./public'));
+
+// 2. Configuracion del motor de plantillas Mustache
+app.set('view engine', 'html');
+app.engine('html', mustacheExpress(), '.html');
+app.set('views', './views');
+
+// 3. Middleware para parsear cuerpos de peticion codificados como URL (Formularios POST)
+app.use(express.urlencoded({ extended: true }));
+
+// 4. Registro del router principal
+app.use('/', router);
+
+// 5. Apertura del puerto del servidor
+const PORT = 3000;
+app.listen(PORT, () => {
+    console.log(`Servidor web escuchando en http://localhost:${PORT}/`);
+});
+\end{lstlisting}
+
+\subsection{Renderizado en Servidor (SSR) con Plantillas Mustache}
+
+En el desarrollo web del lado del servidor, concatenar cadenas de caracteres para construir código HTML dinámico resulta ineficiente, ilegible y altamente vulnerable a inyecciones de código malicioso. Por ello, se utilizan \textbf{motores de plantillas} (\emph{template engines}). En este curso utilizaremos \textbf{Mustache} (mediante el paquete \texttt{mustache-express}), caracterizado por ser un motor libre de lógica arbitraria (\emph{logic-less}).
+
+\subsubsection{Sintaxis Esencial de Mustache}
+\begin{itemize}
+    \item \textbf{Interpolación de Variables (\texttt{\{\{variable\}\}}):} Imprime el valor de la propiedad escapando automáticamente los caracteres HTML especiales para evitar ataques XSS (\emph{Cross-Site Scripting}).
+    \item \textbf{Secciones Condicionales e Iterativas (\texttt{\{\{\#seccion\}\} ... \{\{/seccion\}\}}):}
+    \begin{itemize}
+        \item Si la propiedad es un booleano con valor \texttt{true}, el bloque HTML se renderiza.
+        \item Si la propiedad es una lista o array, el bloque se itera por cada elemento. Dentro del bloque, el punto \texttt{\{\{.\}\}} representa el elemento actual en tipos primitivos, o se accede directamente a los nombres de los atributos si son objetos (\texttt{\{\{nombre\}\}}).
+    \end{itemize}
+    \item \textbf{Secciones Invertidas (\texttt{\{\{\textasciicircum seccion\}\} ... \{\{/seccion\}\}}):} Se renderiza únicamente si la propiedad es \texttt{false}, \texttt{null}, \texttt{undefined} o un array vacío (actuando como el bloque \texttt{else} condicional).
+    \item \textbf{Inclusión de Parciales (\texttt{\{\{>nombrePlantilla\}\}}):} Permite componer vistas reutilizando bloques compartidos como cabeceras (\texttt{header.html}) y pies de página (\texttt{footer.html}).
+\end{itemize}
+
+\begin{lstlisting}[language=html, caption={views/listado.html: Ejemplo de plantilla Mustache}]
+{{>header}}
+<h1>Catalogo de Productos</h1>
+
+{{#hayOfertas}}
+    <p class="alerta">¡Hay descuentos especiales disponibles!</p>
+{{/hayOfertas}}
+
+<ul>
+{{#productos}}
+    <li><strong>{{nombre}}</strong> - Precio: {{precio}} EUR</li>
+{{/productos}}
+{{^productos}}
+    <p>No se encontraron productos registrados en el sistema.</p>
+{{/productos}}
+</ul>
+
+{{>footer}}
+\end{lstlisting}
+
+\subsection{Procesamiento de Formularios, Parámetros y el Patrón PRG}
+
+La comunicación de datos desde el navegador hacia el servidor Express se materializa mediante tres vías principales:
+
+\subsubsection{1. Formularios GET vs POST}
+\begin{itemize}
+    \item \textbf{Formularios GET:} Los datos de los campos de texto se codifican en la propia URL en forma de \emph{Query String} (\texttt{/buscar?termino=laptop\&pagina=2}). En Express, los valores se leen inmediatamente desde el objeto \textbf{\texttt{req.query}} (\texttt{req.query.termino}). Está pensado para consultas seguras e idempotentes que no modifican el estado del servidor.
+    \item \textbf{Formularios POST:} Los datos viajan encapsulados en el cuerpo (\emph{body}) de la petición HTTP con la cabecera \texttt{Content-Type: application/x-www-form-urlencoded}. En Express, para que dichos campos sean procesados es imprescindible registrar el middleware \texttt{express.urlencoded(\{ extended: true \})}, tras lo cual están accesibles en el objeto \textbf{\texttt{req.body}} (\texttt{req.body.nombre}).
+\end{itemize}
+
+\subsubsection{2. Parámetros de Ruta (Path Parameters)}
+Cuando un dato forma parte integral de la identidad del recurso REST, se incluye como un segmento de la propia ruta precedido por dos puntos:
+\begin{lstlisting}[language=javascript]
+// Captura de parametros en la URL
+router.get('/usuarios/:id/pedidos/:numPedido', (req, res) => {
+    const idUsuario = req.params.id;
+    const pedido = req.params.numPedido;
+    res.send(`Consultando pedido ${pedido} del usuario ${idUsuario}`);
+});
+\end{lstlisting}
+
+\subsubsection{El Patrón Post-Redirect-Get (PRG)}
+Uno de los principios de diseño de mayor relevancia en ingeniería web es el patrón \textbf{Post-Redirect-Get}:
+
+\begin{importante}{Por qué es fundamental el Patrón PRG}
+Cuando un usuario envía un formulario mediante el método \texttt{POST} (por ejemplo, para realizar un pago o insertar un registro) y el servidor responde renderizando directamente un HTML con código 200 OK, si el usuario pulsa la tecla F5 o el botón de recargar del navegador, \textbf{la petición POST completa volverá a enviarse}, provocando una inserción duplicada en la base de datos o un cobro repetido.
+
+Para solucionar este defecto arquitectónico, el patrón PRG prescribe:
+\begin{enumerate}
+    \item El cliente envía el formulario mediante \texttt{POST}.
+    \item El servidor procesa la mutación de datos.
+    \item En lugar de responder con HTML, el servidor emite una redirección HTTP 302 o 303 mediante \texttt{res.redirect('/ruta-destino')}.
+    \item El navegador recibe la orden de redirección y solicita automáticamente la nueva página mediante una petición inocua de tipo \textbf{\texttt{GET}}.
+\end{enumerate}
+De este modo, si el usuario refresca la pantalla, solo refrescará la petición GET final sin duplicar la acción de inserción.
+\end{importante}
+
+\subsection{Ejercicios Resueltos del Bloque 3.2.1: Tablón de Anuncios}
+
+\begin{ejercicioresuelto}{4}{Aplicación Web Completa del Tablón de Anuncios}
+\textbf{Enunciado:} Desarrollar una aplicación web completa con Node.js y Express que gestione un Tablón de Anuncios en memoria con las siguientes especificaciones:
+\begin{enumerate}
+    \item \textbf{Página Principal (\texttt{/}):} Lista todos los anuncios existentes (mostrando usuario y título) con un enlace para ver el detalle de cada uno y otro enlace para redactar un nuevo anuncio.
+    \item \textbf{Página de Formulario (\texttt{/new\_post.html}):} Formulario que solicita usuario, título y cuerpo del mensaje.
+    \item \textbf{Controlador de Inserción (\texttt{POST /post/new}):} Recoge los datos del formulario, almacena el nuevo post asignándole un identificador único numérico incremental y muestra la vista de confirmación.
+    \item \textbf{Página de Detalle (\texttt{/post/:id}):} Muestra el usuario, título y texto completo del post, junto con un enlace para eliminarlo.
+    \item \textbf{Controlador de Eliminación (\texttt{/post/:id/delete}):} Elimina el post especificado y confirma la operación.
+\end{enumerate}
+
+\textbf{Solución y Análisis:}
+
+Comenzamos implementando la capa de gestión de datos en memoria en \texttt{src/board.js}, encapsulada mediante un \texttt{Map} para garantizar accesos $O(1)$ por identificador:
+\begin{lstlisting}[language=javascript, caption={src/board.js: Gestión de anuncios en memoria}]
+const posts = new Map();
+let nextId = 1;
+
+export function addPost(post) {
+    const id = (nextId++).toString();
+    post.id = id;
+    posts.set(id, post);
+    return post;
+}
+
+export function getPosts() {
+    return Array.from(posts.values());
+}
+
+export function getPost(id) {
+    return posts.get(id);
+}
+
+export function deletePost(id) {
+    const post = posts.get(id);
+    posts.delete(id);
+    return post;
+}
+\end{lstlisting}
+
+A continuación, implementamos el controlador de rutas en \texttt{src/router.js}:
+\begin{lstlisting}[language=javascript, caption={src/router.js: Enrutamiento del tablón de anuncios}]
+import express from 'express';
+import * as board from './board.js';
+
+const router = express.Router();
+
+// Listado de anuncios
+router.get('/', (req, res) => {
+    res.render('index', {
+        posts: board.getPosts()
+    });
+});
+
+// Guardar nuevo anuncio
+router.post('/post/new', (req, res) => {
+    const post = {
+        user: req.body.user,
+        title: req.body.title,
+        text: req.body.text
+    };
+    board.addPost(post);
+    res.render('saved_post', { id: post.id });
+});
+
+// Ver detalle de anuncio
+router.get('/post/:id', (req, res) => {
+    const post = board.getPost(req.params.id);
+    if (!post) {
+        return res.status(404).send("Anuncio no encontrado");
+    }
+    res.render('show_post', { post });
+});
+
+// Eliminar anuncio
+router.get('/post/:id/delete', (req, res) => {
+    board.deletePost(req.params.id);
+    res.render('deleted_post');
+});
+
+export default router;
+\end{lstlisting}
+
+Y las plantillas correspondientes en la carpeta \texttt{views/}:
+
+\begin{lstlisting}[language=html, caption={views/index.html: Listado de anuncios}]
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Tablon de Anuncios</title></head>
+<body>
+    <h1>Tablon de Anuncios</h1>
+    {{#posts}}
+        <p><a href="/post/{{id}}">{{user}}: {{title}}</a></p>
+    {{/posts}}
+    {{^posts}}
+        <p>No hay ningun anuncio publicado todavia.</p>
+    {{/posts}}
+    <hr>
+    <a href="/new_post.html">Crear nuevo anuncio</a>
+</body>
+</html>
+\end{lstlisting}
+
+\begin{lstlisting}[language=html, caption={public/new\_post.html: Formulario HTML estático}]
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Nuevo Anuncio</title></head>
+<body>
+    <h1>Publicar Anuncio</h1>
+    <form action="/post/new" method="post">
+        <p>Usuario: <input type="text" name="user" required></p>
+        <p>Titulo: <input type="text" name="title" required></p>
+        <p>Mensaje:<br><textarea name="text" rows="5" cols="40" required></textarea></p>
+        <p><input type="submit" value="Guardar Anuncio"></p>
+    </form>
+</body>
+</html>
+\end{lstlisting}
+
+\begin{lstlisting}[language=html, caption={views/show\_post.html: Detalle del anuncio}]
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>{{post.title}}</title></head>
+<body>
+    <h1>{{post.title}}</h1>
+    <p><strong>Autor:</strong> {{post.user}}</p>
+    <p>{{post.text}}</p>
+    <hr>
+    <a href="/post/{{post.id}}/delete">Eliminar anuncio</a> | 
+    <a href="/">Volver al listado</a>
+</body>
+</html>
+\end{lstlisting}
+
+\begin{importante}{Advertencia de Seguridad: Vulnerabilidad CSRF}
+Tal como se señala en las diapositivas, eliminar un registro sensible mediante una petición \texttt{GET} en un enlace (\texttt{/post/:id/delete}) vulnera las buenas prácticas de seguridad y expone la aplicación a ataques de \textbf{Cross-Site Request Forgery (CSRF)}. Un sitio web malicioso podría incrustar una etiqueta \texttt{<img src='http://servidor-victima/post/1/delete'>} y provocar la eliminación involuntaria de anuncios si el usuario autenticado visita dicha página. En aplicaciones de producción, las acciones de borrado deben orquestarse siempre mediante formularios \texttt{POST} protegidos con tokens anti-CSRF.
+\end{importante}
+\end{ejercicioresuelto}
+
+\section{Gestión y Subida de Archivos con Multer (3.2.2)}
+
+\subsection{El Protocolo de Subida de Ficheros: \texttt{multipart/form-data}}
+
+El envío estándar de formularios mediante \texttt{application/x-www-form-urlencoded} no resulta adecuado para transmitir flujos binarios de información (como imágenes JPG o documentos PDF), ya que el coste de codificación sobrecarga sustancialmente el ancho de banda. Para subir archivos se utiliza el tipo de contenido \textbf{\texttt{multipart/form-data}}, donde el cuerpo de la petición se divide en secciones delimitadas por fronteras (\emph{boundaries}), cada una con sus propias cabeceras y flujo binario.
+
+Para habilitar este comportamiento en el cliente, el formulario HTML debe incorporar obligatoriamente el atributo \texttt{enctype}:
+\begin{lstlisting}[language=html]
+<form action="/upload_image" method="post" enctype="multipart/form-data">
+    <input type="file" name="imagen" accept=".jpg, .jpeg, .png">
+    <input type="submit" value="Subir Archivo">
+</form>
+\end{lstlisting}
+
+\subsection{Almacenamiento Seguro: ¿Por qué NUNCA en la carpeta \texttt{public/}?}
+
+Uno de los errores más graves cometidos por desarrolladores noveles consiste en almacenar los archivos subidos por los usuarios directamente dentro del directorio \texttt{public/} de archivos estáticos. 
+
+\begin{importante}{Riesgos de almacenar subidas en \texttt{public/}}
+\begin{enumerate}
+    \item \textbf{Mezcla indebida de código estático y dinámico:} Los recursos estáticos forman parte del código fuente de la aplicación (controlados por Git), mientras que las subidas de los usuarios son datos de producción volátiles.
+    \item \textbf{Permisos de solo lectura en contenedores:} En despliegues empresariales modernos con Docker o plataformas Cloud (AWS ECS, Kubernetes), el contenedor de la aplicación suele montarse con un sistema de archivos de solo lectura (\emph{read-only root filesystem}), por lo que cualquier intento de escribir dentro de \texttt{public/} provocará un fallo de permisos catastrófico.
+    \item \textbf{Vulnerabilidad de Ejecución Remota de Código (RCE):} Si un usuario malintencionado logra subir un archivo ejecutable (como un script JavaScript o PHP) a la carpeta pública y el servidor lo sirve sin restricciones, el atacante podría solicitar la ejecución remota de dicho archivo en el host.
+\end{enumerate}
+Por tanto, las subidas deben dirigirse \textbf{siempre a una carpeta externa dedicada (por ejemplo, \texttt{uploads/})}, y el acceso a dichos archivos debe canalizarse a través de un controlador que verifique la autenticación y aplique medidas de seguridad.
+\end{importante}
+
+\subsection{Configuración de Multer y Servicio Seguro de Imágenes}
+
+Para gestionar peticiones \texttt{multipart/form-data} en Express se utiliza la biblioteca \textbf{\texttt{multer}}:
+\begin{lstlisting}[language=bash]
+$ npm install --save multer
+\end{lstlisting}
+
+Multer intercepta la petición entrante, guarda el flujo binario en el disco asignándole un nombre de archivo pseudoaleatorio único (sin extensión, para prevenir sobreescrituras y ejecuciones no deseadas) y añade a la petición el objeto \textbf{\texttt{req.file}}:
+
+\begin{lstlisting}[language=javascript, caption={Integración y control seguro de subidas con Multer}]
+import express from 'express';
+import multer from 'multer';
+
+const router = express.Router();
+// Configuracion del directorio de destino para subidas
+const upload = multer({ dest: 'uploads/' });
+
+// Ruta de subida de imagen individual
+router.post('/upload_image', upload.single('imagen'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).send("No se ha seleccionado ningun archivo");
+    }
+
+    // req.file contiene metadatos criticos:
+    // filename: nombre generado en el disco ('uploads/a83f98c...')
+    // originalname: nombre original del archivo en el cliente
+    // mimetype: tipo MIME ('image/jpeg')
+    // size: tamano en bytes
+    res.render('imagen_subida', { nombreArchivo: req.file.filename });
+});
+
+// Servicio seguro del archivo para descarga o visualizacion
+router.get('/image', (req, res) => {
+    const filename = req.query.filename;
+
+    // PREVENCION CRITICA DE PATH TRAVERSAL:
+    // Si el nombre contiene barras diagonales (\ o /), se rechaza la peticion
+    if (/[\\/]/.test(filename)) {
+        return res.status(400).send("Ataque Path Traversal detectado");
+    }
+
+    // Envio seguro del archivo como descarga o stream binario
+    res.download('uploads/' + filename);
+});
+\end{lstlisting}
+
+\subsection{Ejercicio Resuelto 5: Tablón de Anuncios con Imágenes}
+
+\begin{ejercicioresuelto}{5}{Ampliación del Tablón con Soporte Multimedia y Carga de Demo}
+\textbf{Enunciado:} Ampliar el Tablón de Anuncios (Ejercicio 4) incorporando las siguientes capacidades:
+\begin{enumerate}
+    \item Permitir adjuntar opcionalmente una imagen al publicar un nuevo anuncio mediante Multer.
+    \item Servir la imagen en la vista de detalle mediante la ruta \texttt{/post/:id/image}.
+    \item Al eliminar un anuncio, borrar físicamente la imagen asociada del disco mediante el módulo \texttt{node:fs/promises}.
+    \item Implementar un script \texttt{load\_data.js} que limpie el directorio \texttt{uploads/}, cargue anuncios de demostración desde un archivo JSON y copie las imágenes correspondientes desde \texttt{data/images/}.
+\end{enumerate}
+
+\textbf{Solución y Análisis:}
+
+Actualizamos el formulario \texttt{new\_post.html} para admitir archivos:
+\begin{lstlisting}[language=html]
+<form action="/post/new" method="post" enctype="multipart/form-data">
+    <p>Usuario: <input type="text" name="user" required></p>
+    <p>Titulo: <input type="text" name="title" required></p>
+    <p>Mensaje:<br><textarea name="text" rows="5" cols="40"></textarea></p>
+    <p>Imagen adjunta: <input type="file" name="image" accept=".jpg,.jpeg,.png"></p>
+    <p><input type="submit" value="Publicar con Imagen"></p>
+</form>
+\end{lstlisting}
+
+En el controlador \texttt{src/router.js}, adaptamos la ruta de inserción y de borrado:
+\begin{lstlisting}[language=javascript, caption={src/router.js con soporte de subida y borrado de imágenes}]
+import express from 'express';
+import multer from 'multer';
+import fs from 'node:fs/promises';
+import * as board from './board.js';
+
+const router = express.Router();
+const UPLOADS_FOLDER = './uploads';
+const upload = multer({ dest: UPLOADS_FOLDER });
+
+// Insercion con Multer
+router.post('/post/new', upload.single('image'), (req, res) => {
+    const post = {
+        user: req.body.user,
+        title: req.body.title,
+        text: req.body.text,
+        // Si el usuario subio imagen, guardamos el nombre generado
+        imageFilename: req.file ? req.file.filename : null
+    };
+    board.addPost(post);
+    res.render('saved_post', { id: post.id });
+});
+
+// Servir la imagen asociada al post
+router.get('/post/:id/image', (req, res) => {
+    const post = board.getPost(req.params.id);
+    if (!post || !post.imageFilename) {
+        return res.status(404).send("Imagen no encontrada");
+    }
+    res.download(`${UPLOADS_FOLDER}/${post.imageFilename}`);
+});
+
+// Eliminacion con borrado fisico de la imagen en disco
+router.get('/post/:id/delete', async (req, res) => {
+    const post = board.deletePost(req.params.id);
+    if (post && post.imageFilename) {
+        try {
+            await fs.rm(`${UPLOADS_FOLDER}/${post.imageFilename}`);
+            console.log(`Archivo ${post.imageFilename} eliminado del disco`);
+        } catch (err) {
+            console.error("Error al borrar el archivo fisico:", err.message);
+        }
+    }
+    res.render('deleted_post');
+});
+\end{lstlisting}
+
+En la plantilla \texttt{views/show\_post.html}, mostramos la imagen de forma condicional:
+\begin{lstlisting}[language=html]
+<h1>{{post.title}}</h1>
+<p>Publicado por: {{post.user}}</p>
+<p>{{post.text}}</p>
+
+{{#post.imageFilename}}
+    <div>
+        <img src="/post/{{post.id}}/image" alt="Imagen del anuncio" style="max-width:400px; height:auto;">
+    </div>
+{{/post.imageFilename}}
+
+<hr>
+<a href="/post/{{post.id}}/delete">Eliminar anuncio</a> | <a href="/">Inicio</a>
+\end{lstlisting}
+
+Por último, el script de inicialización \texttt{load\_data.js} orquesta la carga idempotente de datos:
+\begin{lstlisting}[language=javascript, caption={load\_data.js: Inicialización de datos de demo e imágenes}]
+import fs from 'node:fs/promises';
+import * as board from './src/board.js';
+
+const UPLOADS_FOLDER = './uploads';
+const DATA_FOLDER = './data';
+
+// 1. Leer y parsear el archivo JSON de anuncios
+const dataRaw = await fs.readFile(`${DATA_FOLDER}/data.json`, 'utf8');
+const anunciosDemo = JSON.parse(dataRaw);
+
+for (const post of anunciosDemo) {
+    board.addPost(post);
+}
+
+// 2. Limpiar la carpeta de subidas y recrearla
+await fs.rm(UPLOADS_FOLDER, { recursive: true, force: true });
+await fs.mkdir(UPLOADS_FOLDER, { recursive: true });
+
+// 3. Copiar las imagenes de prueba a la carpeta de uploads activa
+await fs.cp(`${DATA_FOLDER}/images`, UPLOADS_FOLDER, { recursive: true });
+
+console.log("Datos de demostracion e imagenes cargados con exito.");
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\section{Introducción a las Bases de Datos (3.3.1)}
+
+\subsection{El Problema de la Persistencia en Memoria Volátil}
+
+En las secciones precedentes hemos gestionado la información del Tablón de Anuncios mediante estructuras de datos en memoria (\texttt{Map}). Aunque este enfoque resulta pedagógicamente directo, presenta limitaciones arquitectónicas insalvables en producción:
+\begin{enumerate}
+    \item \textbf{Volatilidad:} Al detenerse el proceso de Node.js (por reinicios, despliegue de nuevas versiones o fallos imprevistos), toda la información almacenada en la memoria RAM se pierde irreversiblemente.
+    \item \textbf{Imposibilidad de Escalado Horizontal:} Si la carga de peticiones se incrementa y se despliegan múltiples instancias de la aplicación web tras un balanceador de carga, cada instancia mantendría su propia memoria local aislada, generando inconsistencias graves e inaceptables para los usuarios.
+    \item \textbf{Falta de Concurrencia Robusta:} La memoria local carece de mecanismos formales para garantizar transacciones, aislamiento y control de concurrencia ante miles de operaciones simultáneas.
+\end{enumerate}
+
+Para resolver estos desafíos, la arquitectura de los sistemas software separa limpiamente la capa de aplicación de la \textbf{capa de persistencia}, materializada mediante un \textbf{Sistema Gestor de Bases de Datos (SGBD / DBMS)}.
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    box/.style={rectangle, draw=primary, fill=bglight, thick, minimum width=3.5cm, minimum height=1.1cm, align=center, rounded corners=4pt},
+    arrow/.style={Latex-Latex, thick, color=secondary}
+]
+    \node[box] (client) {Capa de Presentación\\(Navegadores Web / Móviles)};
+    \node[box, right=1.8cm of client] (server) {Capa de Aplicación\\(Servidor Express / Node.js)};
+    \node[box, right=1.8cm of server] (db) {Capa de Datos\\(SGBD: MongoDB / PostgreSQL)};
+
+    \draw[arrow] (client) -- node[above, font=\footnotesize] {HTTP / REST} node[below, font=\scriptsize\color{commentgray}] {JSON, HTML} (server);
+    \draw[arrow] (server) -- node[above, font=\footnotesize] {Protocolo TCP} node[below, font=\scriptsize\color{commentgray}] {BSON / Driver} (db);
+\end{tikzpicture}
+\caption{Arquitectura típica de tres capas (Three-tier Architecture) en aplicaciones web.}
+\label{fig:three-tier-arch}
+\end{figure}
+
+\subsection{Bases de Datos Relacionales (SQL) vs NoSQL}
+
+Históricamente, el panorama de la persistencia estuvo dominado por las **Bases de Datos Relacionales (RDBMS)**, fundamentadas en el modelo relacional formal de E.F. Codd:
+\begin{itemize}
+    \item La información se organiza en **tablas** (relaciones) bidimensionales compuestas por filas (tuplas) y columnas tipadas (atributos).
+    \item Las relaciones entre entidades se modelan mediante **claves primarias** (\emph{Primary Keys}) y **claves foráneas** (\emph{Foreign Keys}).
+    \item Se consultan y manipulan mediante el lenguaje estandarizado **SQL** (\emph{Structured Query Language}).
+    \item Garantizan propiedades **ACID** estrictas (Atomicidad, Consistencia, Aislamiento y Durabilidad).
+\end{itemize}
+
+A partir de la década de 2000, la explosión de la Web 2.0 y el volumen masivo de datos impulsaron el movimiento **NoSQL** (\emph{Not Only SQL}), motivado por tres causas primordiales:
+
+\begin{definicion}{Factores que impulsaron el auge de NoSQL}
+\begin{enumerate}
+    \item \textbf{Escalabilidad Horizontal (\emph{Sharding}):} Las bases de datos relacionales fueron concebidas para escalar verticalmente (adquiriendo servidores con más CPU y RAM). Distribuir tablas relacionales unidas por complejas operaciones \texttt{JOIN} a lo largo de un clúster de cientos de máquinas resulta extremadamente costoso y difícil. Las soluciones NoSQL fueron diseñadas desde su concepción para particionarse de forma nativa en clústeres horizontales.
+    \item \textbf{Desajuste de Impedancia (\emph{Impedance Mismatch}):} Los desarrolladores modelan sus dominios en lenguajes orientados a objetos con jerarquías, arrays y objetos anidados en memoria. Mapear este grafo de objetos hacia tablas planas relacionales exige descomponer la información en múltiples tablas intermedias unidas por claves ajenas (requiriendo bibliotecas ORM como Hibernate o TypeORM que añaden complejidad).
+    \item \textbf{Flexibilidad de Esquema (\emph{Schemaless}):} En una base de datos relacional, la estructura de las tablas debe definirse rígidamente antes de insertar el primer dato mediante sentencias DDL (\texttt{CREATE TABLE}). Modificar el esquema de una tabla con millones de filas en producción requiere costosas migraciones con bloqueos. Las bases de datos NoSQL permiten esquemas dinámicos donde cada registro puede adaptar su estructura de forma flexible.
+\end{enumerate}
+\end{definicion}
+
+\section{MongoDB: Modelo de Documentos y Shell (3.3.2)}
+
+\subsection{Modelo Documental, BSON y el Identificador \texttt{\_id}}
+
+\textbf{MongoDB} es una base de datos orientada a documentos líder en la industria. La jerarquía de abstracción de MongoDB establece una correspondencia conceptual directa con el mundo relacional:
+
+\begin{table}[htbp]
+\centering
+\small
+\begin{tabularx}{\textwidth}{p{3.8cm} p{4.2cm} X}
+\toprule
+\textbf{Concepto Relacional} & \textbf{Concepto MongoDB} & \textbf{Descripción Técnica} \\
+\midrule
+Base de Datos & Base de Datos (\emph{Database}) & Contenedor lógico de nivel superior. \\
+Tabla & Colección (\emph{Collection}) & Conjunto agrupado de documentos sin esquema rígido obligatorio. \\
+Fila / Tupla & Documento (\emph{Document}) & Registro individual de información estructurada. \\
+Columna & Campo / Atributo (\emph{Field}) & Par clave-valor contenido dentro de un documento. \\
+Clave Primaria (\texttt{PRIMARY KEY}) & Campo \texttt{\_id} (\texttt{ObjectId}) & Identificador universal único e indexado de cada documento. \\
+\bottomrule
+\end{tabularx}
+\caption{Mapeo conceptual entre el modelo relacional y la base de datos documental MongoDB.}
+\label{tab:relacional-vs-mongo}
+\end{table}
+
+\begin{definicion}{Documento BSON}
+Internamente, MongoDB almacena y transmite los datos en formato \textbf{BSON} (\emph{Binary JSON}). BSON es una representación binaria de documentos tipo JSON que proporciona:
+\begin{itemize}
+    \item Alta velocidad de codificación y decodificación computacional.
+    \item Capacidad de atravesar campos de forma rápida sin parsear el texto completo.
+    \item Tipos de datos extendidos que no existen en el estándar JSON: enteros de 64 bits, números \texttt{Decimal128}, fechas nativas (\texttt{Date}), datos binarios y el tipo especial \textbf{\texttt{ObjectId}}.
+\end{itemize}
+\end{definicion}
+
+Cada documento en MongoDB contiene obligatoriamente un campo denominado \textbf{\texttt{\_id}} que actúa como clave primaria única. Si el usuario no suministra un valor explícito al insertar, el motor genera automáticamente un valor de tipo \textbf{\texttt{ObjectId}}:
+\begin{itemize}
+    \item Es un valor binario de \textbf{12 bytes} (representado habitualmente como una cadena hexadecimal de 24 caracteres).
+    \item Se compone internamente de: un timestamp de 4 bytes (momento exacto de creación en segundos desde epoch), un identificador de máquina/proceso de 5 bytes y un contador incremental de 3 bytes.
+    \item Permite extraer de forma gratuita la fecha exacta de creación del documento sin requerir un campo \texttt{createdAt} adicional.
+\end{itemize}
+
+\subsection{Ediciones y Despliegue con Docker}
+
+MongoDB se distribuye en tres modalidades principales:
+\begin{itemize}
+    \item \textbf{Community Edition:} Versión gratuita y de código abierto para desarrollo y entornos locales.
+    \item \textbf{Enterprise Edition:} Versión comercial que incorpora soporte de seguridad empresarial (Kerberos, LDAP, cifrado en reposo) y herramientas avanzadas de auditoría.
+    \item \textbf{MongoDB Atlas:} Plataforma de base de datos totalmente gestionada en la nube (DBaaS) disponible sobre AWS, Google Cloud y Microsoft Azure.
+\end{itemize}
+
+Para desarrollo local, la mejor práctica de ingeniería consiste en instanciar MongoDB de forma aislada mediante un contenedor \textbf{Docker}:
+\begin{lstlisting}[language=bash]
+$ docker run --rm -p 27017:27017 -d --name local-mongo mongo:8.2
+\end{lstlisting}
+El puerto predeterminado de comunicación de MongoDB es el \textbf{27017}.
+
+Para inspeccionar y administrar la base de datos disponemos de:
+\begin{itemize}
+    \item \textbf{MongoDB Compass:} Entorno gráfico de escritorio oficial (GUI).
+    \item \textbf{mongosh (MongoDB Shell):} Interfaz interactiva de consola basada en JavaScript.
+\end{itemize}
+
+\subsection{Operaciones CRUD en la Consola \texttt{mongosh}}
+
+Dentro de la consola interactiva \texttt{mongosh}, los comandos se ejecutan con sintaxis JavaScript:
+
+\subsubsection{1. Conexión y Selección de Base de Datos}
+\begin{lstlisting}[language=javascript]
+// Conectar a la base de datos de pruebas (se crea automaticamente al insertar)
+use tienda;
+\end{lstlisting}
+
+\subsubsection{2. Inserción de Documentos}
+\begin{lstlisting}[language=javascript]
+// Insercion de un documento individual
+db.usuarios.insertOne({
+    nombre: "Carlos Gomez",
+    edad: 28,
+    ciudad: "Madrid",
+    preferencias: ["tecnologia", "fotografia"]
+});
+// Salida: { acknowledged: true, insertedId: ObjectId('66fa...') }
+\end{lstlisting}
+
+\subsubsection{3. Consultas y Operadores de Filtro}
+\begin{lstlisting}[language=javascript]
+// Consultar todos los documentos de la coleccion
+db.usuarios.find();
+
+// Consultar con filtro exacto
+db.usuarios.findOne({ nombre: "Carlos Gomez" });
+
+// Operadores de comparacion: $gt (>), $gte (>=), $lt (<), $lte (<=), $ne (!=)
+db.usuarios.find({ edad: { $gte: 18 } });
+
+// Operadores logicos: $and, $or
+db.usuarios.find({
+    $or: [
+        { ciudad: "Madrid" },
+        { edad: { $lt: 25 } }
+    ]
+});
+
+// Proyecciones: 1 para incluir campo, 0 para excluir (el _id viene por defecto)
+db.usuarios.find({ ciudad: "Madrid" }, { _id: 0, nombre: 1, edad: 1 });
+\end{lstlisting}
+
+\subsubsection{4. Actualización y Borrado}
+\begin{lstlisting}[language=javascript]
+// Actualizar el primer documento que cumpla la condicion mediante $set
+db.usuarios.updateOne(
+    { nombre: "Carlos Gomez" },
+    { $set: { edad: 29 } }
+);
+
+// Borrar el primer documento coincidente
+db.usuarios.deleteOne({ nombre: "Carlos Gomez" });
+
+// Borrar todos los documentos de una coleccion
+db.usuarios.deleteMany({ ciudad: "Madrid" });
+\end{lstlisting}
+
+\section{MongoDB con Node.js (3.3.3)}
+
+\subsection{El Driver Oficial \texttt{mongodb} y Conexión Asíncrona}
+
+Para conectar aplicaciones Node.js con MongoDB se emplea el driver oficial:
+\begin{lstlisting}[language=bash]
+$ npm install --save mongodb
+\end{lstlisting}
+
+La comunicación con la base de datos involucra operaciones de E/S de red. En consecuencia, \textbf{todas las operaciones del cliente devuelven promesas (\texttt{Promise})} y deben invocarse obligatoriamente mediante la sintaxis moderna \textbf{\texttt{async / await}}.
+
+\begin{lstlisting}[language=javascript, caption={Conexión y ciclo de vida básico con el driver de MongoDB}]
+import { MongoClient, ObjectId } from 'mongodb';
+
+const URI = 'mongodb://localhost:27017';
+const client = new MongoClient(URI);
+
+try {
+    // 1. Establecer conexion con el cluster
+    await client.connect();
+    console.log("Conectado exitosamente a MongoDB");
+
+    // 2. Obtener referencia a la base de datos y coleccion
+    const db = client.db('cine');
+    const peliculas = db.collection('peliculas');
+
+    // 3. Insercion
+    const resultado = await peliculas.insertOne({
+        titulo: "Regreso al Futuro",
+        director: "Robert Zemeckis",
+        anio: 1985
+    });
+    console.log("Pelicula insertada con id:", resultado.insertedId);
+
+} finally {
+    // Cerrar cliente al finalizar el proceso
+    await client.close();
+}
+\end{lstlisting}
+
+\subsection{Operaciones de Inserción y Carga Masiva}
+
+\begin{itemize}
+    \item \texttt{collection.insertOne(doc)}: Inserta un documento único. Devuelve un objeto que contiene \texttt{insertedId}. Además, \textbf{el propio objeto pasado como argumento muta}, incorporando automáticamente la propiedad \texttt{\_id} generada.
+    \item \texttt{collection.insertMany([docs])}: Inserta un array de documentos en una única operación de red por lotes (\emph{bulk insert}). Devuelve un mapa con todos los \texttt{insertedIds}.
+\end{itemize}
+
+Para inicializar bases de datos cargando ficheros JSON completos:
+\begin{lstlisting}[language=javascript]
+import { readFile } from 'node:fs/promises';
+
+const datosStr = await readFile('./data/peliculas.json', 'utf8');
+const listaPeliculas = JSON.parse(datosStr);
+
+// Insercion masiva directa
+const res = await peliculas.insertMany(listaPeliculas);
+console.log(`${res.insertedCount} peliculas insertadas en la coleccion.`);
+\end{lstlisting}
+
+\subsection{Consultas Avanzadas, Cursores, Paginación y Proyección}
+
+\subsubsection{Procesamiento por Cursor vs \texttt{toArray()}}
+Al invocar \texttt{collection.find(filtro)}, MongoDB no transfiere de golpe todos los documentos a la memoria de la aplicación, sino que retorna un **Cursor**. Un cursor es un iterador que recupera los documentos en lotes bajo demanda a medida que se recorre:
+\begin{lstlisting}[language=javascript]
+// Enfoque 1: Carga total en un array en memoria (adecuado para colecciones pequenas)
+const todos = await peliculas.find().toArray();
+
+// Enfoque 2: Procesamiento secuencial mediante stream asincrono (adecuado para millones de filas)
+const cursor = peliculas.find();
+for await (const pelicula of cursor) {
+    console.log("Procesando:", pelicula.titulo);
+}
+\end{lstlisting}
+
+\subsubsection{Filtros, Expresiones Regulares y Operadores Lógicos}
+\begin{lstlisting}[language=javascript]
+// Consulta con operador $in (pertenencia a conjunto)
+const cineClasico = await peliculas.find({
+    anio: { $in: [1975, 1980, 1985] }
+}).toArray();
+
+// Consulta mediante expresiones regulares ($regex)
+const peliculasAmor = await peliculas.find({
+    titulo: { $regex: /love/i } // 'i' para busqueda insensible a mayusculas/minusculas
+}).toArray();
+
+// Consulta compuesta con $and y $or
+const resultado = await peliculas.find({
+    $and: [
+        { anio: { $gte: 1980, $lte: 1989 } },
+        { $or: [{ genero: "Ciencia Ficcion" }, { director: "Steven Spielberg" }] }
+    ]
+}).toArray();
+\end{lstlisting}
+
+\subsubsection{Ordenación, Paginación y Proyección}
+En servicios web REST, devolver millones de registros satura la red y la memoria. Por ello, se implementa siempre paginación en el servidor combinando los métodos encadenables \texttt{.sort()}, \texttt{.skip()} y \texttt{.limit()}:
+\begin{lstlisting}[language=javascript]
+const pagina = 2;
+const tamanoPagina = 10;
+
+const resultadoPaginado = await peliculas.find()
+    .sort({ anio: -1, titulo: 1 }) // Orden: anio descendente (-1), titulo ascendente (1)
+    .skip((pagina - 1) * tamanoPagina) // Descartar los elementos de paginas previas
+    .limit(tamanoPagina) // Limitar la respuesta al tamano de pagina
+    .project({ _id: 1, titulo: 1, anio: 1 }) // Proyeccion: obtener unicamente titulo y anio
+    .toArray();
+\end{lstlisting}
+
+\subsection{Actualización y Eliminación de Documentos}
+
+\begin{itemize}
+    \item \texttt{updateOne(filtro, actualizacion)}: Modifica el primer documento que coincide con el filtro. Es imperativo utilizar operadores atómicos de actualización como \textbf{\texttt{\$set}} (para modificar o añadir campos concretos) o \textbf{\texttt{\$inc}} (para incrementar contadores numéricos). Si se omite el operador y se pasa un objeto plano, las versiones modernas del driver lanzan error para prevenir la sustitución accidental de todo el documento.
+\begin{lstlisting}[language=javascript]
+const resUpdate = await peliculas.updateOne(
+    { _id: new ObjectId(idCadena) },
+    { $set: { recaudacion: 380000000, disponible: true } }
+);
+console.log(`Coincidentes: ${resUpdate.matchedCount}, Modificados: ${resUpdate.modifiedCount}`);
+\end{lstlisting}
+    \item \texttt{replaceOne(filtro, nuevoDocumento)}: Sustituye el documento por completo (conservando el mismo \texttt{\_id}).
+    \item \texttt{deleteOne(filtro)} y \texttt{deleteMany(filtro)}: Eliminan uno o múltiples documentos, devolviendo la propiedad \texttt{deletedCount}.
+\end{itemize}
+
+\subsection{Gestión Avanzada de Arrays de Objetos Embebidos}
+
+Una de las capacidades más potentes de MongoDB consiste en modelar relaciones 1:N embebiendo arrays de subdocumentos dentro de un documento principal (por ejemplo, la lista de tareas dentro de un usuario o los comentarios dentro de un artículo).
+
+Para manipular subdocumentos individuales dentro de un array sin sobrescribir el array entero, MongoDB dispone de operadores especializados:
+
+\begin{lstlisting}[language=javascript, caption={Gestión de subdocumentos embebidos en arrays con MongoDB}]
+// 1. Insercion de documento con subdocumentos que poseen su propio _id
+const usuario = {
+    nombre: "Juan",
+    tareas: [
+        { _id: new ObjectId(), titulo: "Aprender Node.js", hecha: true },
+        { _id: new ObjectId(), titulo: "Aprender Express", hecha: false }
+    ]
+};
+await usuarios.insertOne(usuario);
+
+// 2. Agregar un nuevo subdocumento al array mediante $push
+const nuevaTarea = { _id: new ObjectId(), titulo: "Aprender MongoDB", hecha: false };
+await usuarios.updateOne(
+    { _id: usuario._id },
+    { $push: { tareas: nuevaTarea } }
+);
+
+// 3. Modificar un campo de un subdocumento especifico mediante el operador posicional $
+// El filtro identifica la posicion coincidente dentro del array
+await usuarios.updateOne(
+    { _id: usuario._id, "tareas._id": nuevaTarea._id },
+    { $set: { "tareas.$.hecha": true } }
+);
+
+// 4. Consultar y proyectar unicamente el subdocumento coincidente mediante $elemMatch
+const docConSubdoc = await usuarios.findOne(
+    { _id: usuario._id },
+    { projection: { tareas: { $elemMatch: { _id: nuevaTarea._id } } } }
+);
+const tareaRecuperada = docConSubdoc.tareas[0];
+
+// 5. Eliminar un subdocumento del array mediante $pull
+await usuarios.updateOne(
+    { _id: usuario._id },
+    { $pull: { tareas: { _id: nuevaTarea._id } } }
+);
+\end{lstlisting}
+
+\subsection{Ejercicio Resuelto 1: Consultas Complejas sobre Catálogo de Películas}
+
+\begin{ejercicioresuelto}{1}{Consultas sobre \texttt{movies.json} con el Driver de Node.js}
+\textbf{Enunciado:} Cargar el conjunto de datos de películas provisto en \texttt{movies.json} en una colección de MongoDB y programar un script en Node.js que resuelva e imprima en consola las siguientes cuatro consultas de ingeniería:
+\begin{enumerate}
+    \item El título y año de todas las películas producidas durante la década de los 80 (años 1980 a 1989 ambos inclusive).
+    \item La información íntegra de todas las películas que pertenezcan a la franquicia de \emph{Star Wars}.
+    \item El título y año de las 5 películas más recientes registradas en la colección.
+    \item El título y género de las películas de género Romántico o que contengan la palabra \texttt{'love'} en su título (empleando expresiones regulares).
+\end{enumerate}
+
+\textbf{Solución y Análisis:}
+\begin{lstlisting}[language=javascript, caption={Script de consultas complejas sobre movies.json}]
+import { MongoClient } from 'mongodb';
+import { readFile } from 'node:fs/promises';
+
+const client = new MongoClient('mongodb://localhost:27017');
+
+async function ejecutarConsultas() {
+    try {
+        await client.connect();
+        const db = client.db('cine_db');
+        const movies = db.collection('movies');
+
+        // Carga inicial idempotente
+        await movies.deleteMany({});
+        const rawData = await readFile('./data/movies.json', 'utf8');
+        await movies.insertMany(JSON.parse(rawData));
+        console.log("Catalogo de peliculas cargado con exito.\n");
+
+        // Consulta 1: Peliculas de los anos 80 proyectando titulo y anio
+        console.log("=== 1. Peliculas de los anos 80 (1980-1989) ===");
+        const decada80 = await movies.find({
+            year: { $gte: 1980, $lte: 1989 }
+        })
+        .project({ _id: 0, title: 1, year: 1 })
+        .toArray();
+        console.log(decada80);
+
+        // Consulta 2: Saga Star Wars (busqueda por patron en el titulo)
+        console.log("\n=== 2. Peliculas de Star Wars ===");
+        const starWars = await movies.find({
+            title: { $regex: /Star Wars/i }
+        }).toArray();
+        console.log(starWars);
+
+        // Consulta 3: Las 5 peliculas mas recientes
+        console.log("\n=== 3. Las 5 peliculas mas recientes ===");
+        const recientes = await movies.find()
+            .sort({ year: -1 })
+            .limit(5)
+            .project({ _id: 0, title: 1, year: 1 })
+            .toArray();
+        console.log(recientes);
+
+        // Consulta 4: Peliculas romanticas o con 'love' en el titulo
+        console.log("\n=== 4. Peliculas Romanticas o con 'love' en el titulo ===");
+        const romanticas = await movies.find({
+            $or: [
+                { genre: "Romance" },
+                { genres: "Romance" },
+                { title: { $regex: /love/i } }
+            ]
+        })
+        .project({ _id: 0, title: 1, genre: 1, genres: 1 })
+        .toArray();
+        console.log(romanticas);
+
+    } finally {
+        await client.close();
+    }
+}
+
+ejecutarConsultas().catch(console.error);
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\section{Aplicaciones Web con MongoDB y Express (3.3.4)}
+
+\subsection{Integración de la Capa de Persistencia en Express}
+
+El paso definitivo en el desarrollo del backend consiste en conectar la capa de controladores de Express con la base de datos documental MongoDB, sustituyendo por completo las colecciones efímeras en memoria (\texttt{Map}).
+
+La integración exige tres adaptaciones sistemáticas:
+\begin{enumerate}
+    \item \textbf{Gestión de Identificadores:} El identificador único pasa a ser el campo \texttt{\_id} de tipo \texttt{ObjectId}. En los parámetros de ruta de Express, las URLs reciben identificadores como cadenas de texto (\texttt{req.params.id}), las cuales deben transformarse mediante \texttt{new ObjectId(req.params.id)} al consultar o modificar la base de datos.
+    \item \textbf{Controladores de Ruta Asíncronos:} Los manejadores de rutas en Express deben declararse obligatoriamente con la palabra reservada \textbf{\texttt{async (req, res) => \{ ... \}}} para poder suspender la ejecución con \texttt{await} mientras MongoDB resuelve las operaciones de red.
+    \item \textbf{Reutilización de la Conexión:} En aplicaciones web en producción, \textbf{nunca se abre y cierra un \texttt{MongoClient} en cada petición HTTP}. El cliente mantiene internamente una agrupación de conexiones (\emph{Connection Pool}). Se inicializa una única instancia de \texttt{MongoClient} al arrancar el servidor y se comparte entre todos los controladores.
+\end{enumerate}
+
+\subsection{Ejercicio Resuelto Completo: Tablón de Anuncios Persistente}
+
+\begin{ejercicioresuelto}{1}{Tablón de Anuncios con Persistencia en MongoDB}
+\textbf{Enunciado:} Refactorizar integralmente la aplicación web del Tablón de Anuncios (Ejercicios 4 y 5) para que todos los anuncios se persistan de forma duradera en una colección de MongoDB denominada \texttt{posts} dentro de la base de datos \texttt{board\_db}. Mantener el soporte de subida y borrado de imágenes adjuntas.
+
+\textbf{Solución y Análisis:}
+
+Reescribimos la capa de datos en \texttt{src/board.js} para que delegue directamente en la colección de MongoDB:
+\begin{lstlisting}[language=javascript, caption={src/board.js: Capa de persistencia con driver oficial de MongoDB}]
+import { MongoClient, ObjectId } from 'mongodb';
+
+const URI = 'mongodb://localhost:27017';
+const client = new MongoClient(URI);
+await client.connect();
+
+const db = client.db('board_db');
+const postsCollection = db.collection('posts');
+
+export async function addPost(post) {
+    // MongoDB asigna y devuelve el _id automaticamente
+    const result = await postsCollection.insertOne(post);
+    post._id = result.insertedId;
+    return post;
+}
+
+export async function getPosts() {
+    return await postsCollection.find().toArray();
+}
+
+export async function getPost(id) {
+    try {
+        return await postsCollection.findOne({ _id: new ObjectId(id) });
+    } catch (err) {
+        // Captura de IDs con formato hexadecimal invalido
+        return null;
+    }
+}
+
+export async function deletePost(id) {
+    try {
+        const post = await getPost(id);
+        if (post) {
+            await postsCollection.deleteOne({ _id: new ObjectId(id) });
+        }
+        return post;
+    } catch (err) {
+        return null;
+    }
+}
+\end{lstlisting}
+
+Actualizamos el enrutador \texttt{src/router.js} para utilizar funciones controladoras asíncronas:
+\begin{lstlisting}[language=javascript, caption={src/router.js: Controladores asíncronos con MongoDB}]
+import express from 'express';
+import multer from 'multer';
+import fs from 'node:fs/promises';
+import * as board from './board.js';
+
+const router = express.Router();
+const UPLOADS_FOLDER = './uploads';
+const upload = multer({ dest: UPLOADS_FOLDER });
+
+// Listado de anuncios desde MongoDB
+router.get('/', async (req, res) => {
+    const posts = await board.getPosts();
+    res.render('index', { posts });
+});
+
+// Insercion asincrona de nuevo anuncio
+router.post('/post/new', upload.single('image'), async (req, res) => {
+    const post = {
+        user: req.body.user,
+        title: req.body.title,
+        text: req.body.text,
+        imageFilename: req.file ? req.file.filename : null,
+        fechaCreacion: new Date()
+    };
+    await board.addPost(post);
+    // Redireccion PRG o renderizado con el _id generado por MongoDB
+    res.render('saved_post', { id: post._id });
+});
+
+// Consulta de detalle de anuncio por su _id
+router.get('/post/:id', async (req, res) => {
+    const post = await board.getPost(req.params.id);
+    if (!post) {
+        return res.status(404).send("Anuncio no encontrado");
+    }
+    res.render('show_post', { post });
+});
+
+// Servicio de imagen
+router.get('/post/:id/image', async (req, res) => {
+    const post = await board.getPost(req.params.id);
+    if (!post || !post.imageFilename) {
+        return res.status(404).send("Imagen no disponible");
+    }
+    res.download(`${UPLOADS_FOLDER}/${post.imageFilename}`);
+});
+
+// Eliminacion en base de datos y borrado fisico de imagen
+router.get('/post/:id/delete', async (req, res) => {
+    const post = await board.deletePost(req.params.id);
+    if (post && post.imageFilename) {
+        try {
+            await fs.rm(`${UPLOADS_FOLDER}/${post.imageFilename}`);
+        } catch (err) {
+            console.error("Error al borrar el archivo fisico:", err.message);
+        }
+    }
+    res.render('deleted_post');
+});
+
+export default router;
+\end{lstlisting}
+
+En las plantillas Mustache (\texttt{views/index.html} y \texttt{views/saved\_post.html}), la única adaptación requerida consiste en utilizar la propiedad \textbf{\texttt{\{\{\_id\}\}}} generada por MongoDB en lugar del antiguo \texttt{\{\{id\}\}}:
+\begin{lstlisting}[language=html, caption={views/index.html adaptado a MongoDB}]
+<!DOCTYPE html>
+<html>
+<head><meta charset="UTF-8"><title>Tablon MongoDB</title></head>
+<body>
+    <h1>Tablon de Anuncios (Persistencia MongoDB)</h1>
+    {{#posts}}
+        <p><a href="/post/{{_id}}">{{user}}: {{title}}</a></p>
+    {{/posts}}
+    {{^posts}}
+        <p>No hay anuncios en la base de datos.</p>
+    {{/posts}}
+    <hr>
+    <a href="/new_post.html">Crear nuevo anuncio</a>
+</body>
+</html>
+\end{lstlisting}
+Con esta arquitectura, el sistema garantiza persistencia duradera de la información, desacoplamiento estricto de responsabilidades, seguridad contra pérdidas de memoria y capacidad de escalabilidad horizontal.
+\end{ejercicioresuelto}

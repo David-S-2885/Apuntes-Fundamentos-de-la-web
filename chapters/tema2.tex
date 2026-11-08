@@ -1,0 +1,1459 @@
+\chapter{Tecnologías de Cliente Web: HTML5, CSS3 y Bootstrap 5}
+\label{cap:tema2}
+
+En este capítulo nos adentramos de lleno en el desarrollo del lado del cliente (\textit{Front-End}). Una interfaz web profesional moderna es el resultado de la integración armónica de tres capas de abstracción bien diferenciadas:
+\begin{enumerate}
+  \item \textbf{Estructura y Semántica:} Implementada mediante \textbf{HTML5}.
+  \item \textbf{Presentación, Diseño y Maquetación Espacial:} Implementada con \textbf{CSS3} (utilizando modelos modernos como Flexbox y CSS Grid).
+  \item \textbf{Frameworks y Aceleración de Prototipado:} Implementado mediante \textbf{Bootstrap 5}, que estandariza componentes UI y un sistema de cuadrícula responsiva de 12 columnas.
+\end{enumerate}
+
+---
+
+\section{HTML5: Estructura, Semántica y Formularios}
+
+\subsection{Definición y Rol en el Ecosistema Web}
+
+\begin{definicion}{HTML (HyperText Markup Language)}
+\textbf{HTML} es el lenguaje de marcado estándar universal utilizado para estructurar y presentar contenido en la World Wide Web. Los navegadores web no son más que motores de renderizado especializados cuyo cometido principal es interpretar el código HTML, descargar los recursos asociados (hojas de estilo, imágenes, fuentes, scripts) y representarlos visualmente en la pantalla del usuario.
+\end{definicion}
+
+El lenguaje no es un lenguaje de programación: carece de estructuras de control de flujo (bucles, condicionales) o evaluación de expresiones aritméticas. Su función es puramente \textbf{estructural y semántica}: indica qué partes del texto son títulos, cuáles son párrafos, dónde hay enlaces, imágenes o tablas, y qué significado tienen dichos bloques dentro de la jerarquía de la información.
+
+\subsection{Diferencias Cruciales: HTML vs. XML vs. XHTML}
+
+Es vital que un ingeniero distinga con claridad estos tres estándares afines:
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{HTML:} Diseñado para la presentación y estructuración de información humana en navegadores web. Tolera cierta flexibilidad sintáctica en elementos vacíos y atributos.
+  \item \textbf{XML:} Diseñado para almacenar e intercambiar datos estructurados entre aplicaciones de forma estricta. Todo elemento debe cerrarse sin excepción y la sintaxis no admite ambigüedades.
+  \item \textbf{XHTML (eXtensible HTML):} Fue un intento del W3C a principios de los años 2000 por reformular HTML bajo las reglas rígidas de XML 1.0 (obligando a cerrar todas las etiquetas con sintaxis como \texttt{<br />} y escribir todo en minúsculas estrictas). Si un documento XHTML contenía un mínimo error de sintaxis, los navegadores debían mostrar una pantalla de error fatal en lugar de renderizar la página. Este enfoque fracasó en la práctica real de la industria.\\
+  En respuesta, el consorcio \textbf{WHATWG} impulsó \textbf{HTML5}, que recuperó un analizador pragmático y tolerante a fallos, adoptando una filosofía orientada a la web viva (\textit{Living Standard}) que se utiliza unánimemente en la actualidad.
+\end{itemize}
+
+\subsection{Entorno de Trabajo, Editores y Documentación Oficial}
+
+Para editar documentos HTML, los ingenieros utilizan herramientas modernas:
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Editores de Código e IDEs:} \textbf{Visual Studio Code} (el editor libre estándar en la industria, complementado con extensiones como \textit{Live Server} u \textit{Open in Default Browser}) y entornos especializados como \textbf{WebStorm} de JetBrains.
+  \item \textbf{Herramientas de Desarrollador (DevTools):} Integradas en navegadores como Google Chrome o Mozilla Firefox (accesibles mediante la tecla \texttt{F12}). Permiten inspeccionar el árbol DOM en vivo, editar estilos CSS en tiempo real, auditar la red (\textit{Network tab}) y evaluar la accesibilidad.
+  \item \textbf{Playgrounds Online:} Entornos en la nube para experimentar y compartir prototipos sin instalar software local: \texttt{codepen.io}, \texttt{jsfiddle.net} y \texttt{jsbin.com}.
+  \item \textbf{Documentación Canónica:} La documentación de referencia absoluta y de máxima calidad mantenida por la comunidad es \textbf{MDN Web Docs} (\url{https://developer.mozilla.org/es/docs/Web/HTML}), complementada por agregadores rápidos como \url{https://devdocs.io/}.
+\end{itemize}
+
+\subsection{Anatomía de un Documento HTML5 Estándar}
+
+Todo documento HTML5 bien estructurado debe cumplir con la siguiente plantilla canónica:
+
+\begin{lstlisting}[language=HTML, caption={Plantilla canónica de un documento HTML5 profesional.}]
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Manual de Fundamentos de la Web para Ingenieros">
+    <title>Título Profesional de la Página</title>
+    <link rel="stylesheet" href="css/estilos.css">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <h1>Bienvenido a la Web Semántica</h1>
+    <p>Este es el cuerpo principal del documento.</p>
+</body>
+</html>
+\end{lstlisting}
+
+\subsubsection{Desglose de los Componentes Fundamentales}
+\begin{enumerate}
+  \item \textbf{\texttt{<!DOCTYPE html>}:} En versiones antiguas de HTML (HTML 4.01), el DOCTYPE requería una larga e incomprensible referencia a un DTD. En HTML5 se simplificó al máximo: solo indica al navegador que interprete el documento siguiendo los estándares web modernos, evitando activar el \textbf{Quirks Mode} (modo de compatibilidad hacia atrás que emula los fallos de renderizado de navegadores de los años 90).
+  \item \textbf{\texttt{<html lang="es">}:} La etiqueta raíz que envuelve todo el documento. El atributo \texttt{lang} es de suma importancia: ayuda a los lectores de pantalla a pronunciar el texto con el acento e idioma correctos y a los motores de búsqueda a indexar el contenido en la región idiomática adecuada.
+  \item \textbf{\texttt{<head>}:} Contenedor de \textbf{metadatos}. La información contenida en el \texttt{<head>} no se dibuja directamente en el área visible de la página web, pero es fundamental para su funcionamiento:
+    \begin{itemize}
+      \item \textbf{\texttt{<meta charset="UTF-8">}:} Especifica la tabla de codificación de caracteres. UTF-8 incluye prácticamente todos los caracteres de todos los alfabetos humanos (incluyendo tildes, la letra eñe y emojis), evitando que aparezcan caracteres corruptos (\textit{mojibake}). Debe colocarse en las primeras líneas del \texttt{<head>}.
+      \item \textbf{\texttt{<meta name="viewport" content="width=device-width, initial-scale=1.0">}:} La directiva indispensable del diseño web responsivo (*Responsive Web Design*). Indica al navegador móvil que fije el ancho del área de visualización (*viewport*) al ancho físico real de la pantalla del dispositivo en lugar de asumir por defecto un escritorio virtual de 980 píxeles.
+      \item \textbf{\texttt{<title>}:} El título que aparece en la pestaña del navegador y en los resultados de búsqueda de Google.
+      \item \textbf{\texttt{<link rel="stylesheet" href="...">}:} Vincula hojas de estilo CSS externas.
+    \end{itemize}
+  \item \textbf{\texttt{<body>}:} Contiene todo el contenido visual y multimedia accesible por el usuario final (textos, imágenes, vídeos, formularios).
+\end{enumerate}
+
+\subsection{Elementos de Texto y Jerarquía Semántica}
+
+El texto en HTML se organiza de forma piramidal y estructurada:
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Encabezados (\texttt{<h1>} a \texttt{<h6>}):} Indican el nivel jerárquico de importancia de las secciones.
+    \begin{importante}{Regla de Oro en Ingeniería: Jerarquía de Títulos}
+    En una página web profesional debe existir \textbf{un único elemento \texttt{<h1>}} que represente el tema principal del documento. Los títulos subsiguientes deben anidarse respetando los niveles de forma continua (\texttt{h1} $\rightarrow$ \texttt{h2} $\rightarrow$ \texttt{h3}) sin saltarse escalones jerárquicos por razones puramente visuales (el tamaño visual se modifica con CSS, nunca cambiando la etiqueta semántica).
+    \end{importante}
+  \item \textbf{Párrafos (\texttt{<p>}):} Bloques de texto continuo. Los navegadores aplican por defecto márgenes verticales para separarlos.
+  \item \textbf{Saltos de Línea forzados (\texttt{<br>}) y Separadores (\texttt{<hr>}):} Elementos autoclusivos. \texttt{<br>} genera un salto de línea dentro de un párrafo sin iniciar uno nuevo; \texttt{<hr>} representa una ruptura temática (*Horizontal Rule*).
+  \item \textbf{Formato Inline Semántico vs. Visual:}
+    \begin{itemize}
+      \item \textbf{\texttt{<strong>}:} Confiere \textbf{gran importancia o urgencia semántica} (los lectores de pantalla lo leen con énfasis marcado; visualmente se renderiza en negrita). Se prefiere a la etiqueta clásica obsoleta \texttt{<b>} (que solo oscurecía el texto sin transmitir significado).
+      \item \textbf{\texttt{<em>}:} Confiere \textbf{énfasis de entonación o estrés léxico} (los lectores de pantalla cambian el tono de voz; visualmente se muestra en cursiva). Se prefiere a la etiqueta puramente estética \texttt{<i>}.
+      \item \textbf{\texttt{<mark>}:} Resalta texto como si se le pasara un marcador fluorescente (útil para términos coincidentes en un buscador).
+      \item \textbf{\texttt{<code>}:} Representa fragmentos de código fuente en tipografía monoespaciada.
+      \item \textbf{\texttt{<pre>}:} Bloque preformateado que conserva exactamente todos los espacios en blanco, tabulaciones y saltos de línea del código original.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Hiperenlaces (\texttt{<a>} - Anchor Tags)}
+
+El hipertexto es el elemento distintivo de la Web: permite conectar documentos entre sí mediante enlaces interactivos:
+
+\begin{lstlisting}[language=HTML, caption={Variantes de hiperenlaces en HTML5.}]
+<!-- 1. Enlace absoluto a un servidor externo -->
+<a href="https://www.urjc.es" target="_blank" rel="noopener noreferrer">Universidad Rey Juan Carlos</a>
+
+<!-- 2. Enlace relativo a otra pagina en el mismo servidor -->
+<a href="contacto.html">Ir a Contacto</a>
+
+<!-- 3. Enlace interno a una seccion dentro de la misma pagina (Ancla) -->
+<a href="#requisitos">Saltar a la seccion de Requisitos</a>
+
+<!-- Destino del ancla en la misma pagina -->
+<h2 id="requisitos">Requisitos del Sistema</h2>
+
+<!-- 4. Protocolos especiales: correo electronico y llamada telefonica -->
+<a href="mailto:soporte@empresa.com">Enviar Correo</a>
+<a href="tel:+34912345678">Llamar a Soporte</a>
+\end{lstlisting}
+
+\begin{importante}{Seguridad en Hiperenlaces: La Vulnerabilidad «Reverse Tabnabbing»}
+Cuando se utiliza el atributo \texttt{target="\_blank"} para abrir un enlace en una pestaña nueva, la página de destino obtiene acceso al objeto JavaScript \texttt{window.opener} de la página original. Un sitio web malicioso podría cambiar la ubicación de la pestaña original (\texttt{window.opener.location = 'sitio-phishing.html'}) sin que el usuario se dé cuenta.\\
+Para neutralizar esta vulnerabilidad de seguridad, los ingenieros deben incluir siempre el atributo:
+\begin{center}
+  \texttt{rel="noopener noreferrer"}
+\end{center}
+Los navegadores modernos aplican \texttt{rel="noopener"} automáticamente por defecto al usar \texttt{target="\_blank"}, pero es una buena práctica de ingeniería declararlo explícitamente.
+\end{importante}
+
+\subsection{Imágenes y Contenido Multimedia}
+
+La inclusión de recursos gráficos se realiza mediante la etiqueta autoclusiva \texttt{<img>}:
+
+\begin{lstlisting}[language=HTML, caption={Inclusión semántica y accesible de imágenes.}]
+<figure>
+    <img src="img/arquitectura.png" 
+         alt="Diagrama arquitectonico de la red cliente-servidor mostrando la peticion HTTP" 
+         width="800" 
+         height="450" 
+         loading="lazy">
+    <figcaption>Figura 1: Flujo de peticiones a traves de la pasarela de servicios.</figcaption>
+</figure>
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{El Atributo Obligatorio \texttt{alt} (Texto Alternativo):}
+    \begin{enumerate}
+      \item \textbf{Accesibilidad Universal:} Los usuarios invidentes o con baja visión utilizan lectores de pantalla que leen en voz alta la descripción del atributo \texttt{alt}.
+      \item \textbf{Resiliencia de Red:} Si la imagen no carga por fallo de conexión o ruta rota, el navegador muestra el texto descriptivo.
+      \item \textbf{SEO:} Los robots de Google y otros motores de búsqueda no «ven» píxeles; entienden el contenido de las imágenes leyendo el atributo \texttt{alt}.
+    \end{enumerate}
+  \item \textbf{Dimensiones (\texttt{width} y \texttt{height}) y Rendimiento:} Indicar siempre las dimensiones nativas en la etiqueta permite al navegador reservar el espacio exacto en pantalla antes de que la imagen termine de descargarse, previniendo el molesto salto de maquetación conocido en ingeniería web como \textbf{CLS (Cumulative Layout Shift)}.
+  \item \textbf{Formatos Gráficos en la Web:}
+    \begin{itemize}
+      \item \textbf{PNG:} Compresión sin pérdida, soporte de canal alfa (transparencia limpia). Ideal para logotipos, esquemas, capturas de pantalla y gráficos con pocos colores sólidos.
+      \item \textbf{JPEG / JPG:} Compresión con pérdida. Ideal para fotografías complejas y texturas con millones de gradientes de color.
+      \item \textbf{GIF:} Limitado a 256 colores. Útil históricamente para animaciones simples de bajo peso.
+      \item \textbf{SVG (Scalable Vector Graphics):} Formato vectorial basado en XML. No contiene píxeles, sino ecuaciones geométricas (líneas, curvas, polígonos). Es infinitamente escalable a cualquier resolución de pantalla (pantallas Retina o 4K) sin perder nitidez y su peso es ridículamente pequeño. Es el estándar indiscutible para iconos y logotipos modernos.
+      \item \textbf{WebP y AVIF:} Formatos modernos de alta compresión desarrollados para optimizar la velocidad de la web, reduciendo el peso de las imágenes entre un 30\% y un 50\% respecto a JPEG sin pérdida perceptible de calidad.
+    \end{itemize}
+\end{itemize}
+
+\subsection{Listas de Elementos}
+
+HTML proporciona tres tipos de listas bien diferenciadas:
+
+\begin{enumerate}
+  \item \textbf{Listas No Ordenadas (\texttt{<ul>}):} Colección de elementos (\texttt{<li>}) donde el orden de aparición no altera el significado. Visualmente se representan con viñetas (*bullets*).
+  \item \textbf{Listas Ordenadas (\texttt{<ol>}):} Colección indexada numéricamente donde la secuencia de los pasos es relevante (recetas, instrucciones de instalación). Admite atributos como \texttt{start="5"}, \texttt{reversed} o \texttt{type="A|a|I|i|1"}.
+  \item \textbf{Listas de Definición (\texttt{<dl>}):} Pares de términos (\texttt{<dt>} - *definition term*) y sus correspondientes descripciones (\texttt{<dd>} - *definition description*). Ideales para glosarios, diccionarios o listas de especificaciones técnicas.
+\end{enumerate}
+
+\begin{lstlisting}[language=HTML, caption={Listas anidadas y de definición en HTML5.}]
+<!-- Lista ordenada con sublista anidada -->
+<ol>
+    <li>Fase de Disenio
+        <ul>
+            <li>Wireframing en Figma</li>
+            <li>Definicion de paleta cromatica</li>
+        </ul>
+    </li>
+    <li>Fase de Implementacion</li>
+</ol>
+
+<!-- Lista de definicion -->
+<dl>
+    <dt>HTTP</dt>
+    <dd>Protocolo de transferencia de hipertexto.</dd>
+    <dt>CSS</dt>
+    <dd>Hojas de estilo en cascada para la capa visual.</dd>
+</dl>
+\end{lstlisting}
+
+\subsection{Tablas de Datos Semánticas}
+
+Las tablas en HTML deben reservarse \textbf{exclusivamente para datos tabulares} (series numéricas, horarios, inventarios, matrices comparativas). Su estructura semántica completa consta de:
+
+\begin{lstlisting}[language=HTML, caption={Estructura completa de una tabla semántica profesional.}]
+<table>
+    <caption>Listado de Alumnos y Calificaciones de la Asignatura</caption>
+    <thead>
+        <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Nombre</th>
+            <th scope="col">Apellidos</th>
+            <th scope="col">Calificacion</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>01</td>
+            <td>David</td>
+            <td>Sticea</td>
+            <td>Sobresaliente (10)</td>
+        </tr>
+        <tr>
+            <td>02</td>
+            <td>Elena</td>
+            <td>Gomez</td>
+            <td>Notable (8.5)</td>
+        </tr>
+    </tbody>
+    <tfoot>
+        <tr>
+            <th scope="row" colspan="3">Nota Media del Grupo</th>
+            <td>9.25</td>
+        </tr>
+    </tfoot>
+</table>
+\end{lstlisting}
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{\texttt{<caption>}:} Título descriptivo accesible de la tabla.
+  \item \textbf{\texttt{<thead>}, \texttt{<tbody>}, \texttt{<tfoot>}:} Agrupaciones lógicas que permiten a los navegadores y a la impresión en papel repetir las cabeceras en cada página si la tabla es muy larga.
+  \item \textbf{\texttt{<th>} vs \texttt{<td>}:} \texttt{<th>} define una celda de encabezado (en negrita y centrada por defecto) e incluye el atributo \texttt{scope="col|row"} para orientar a los lectores de pantalla; \texttt{<td>} es una celda ordinaria de datos.
+  \item \textbf{Fusión de Celdas:}
+    \begin{itemize}
+      \item \texttt{colspan="n"}: Expande la celda a lo largo de $n$ columnas horizontales.
+      \item \texttt{rowspan="n"}: Expande la celda verticalmente a lo largo de $n$ filas consecutivas.
+    \end{itemize}
+\end{itemize}
+
+\subsection{HTML5 Semántico: Maquetación Estructural Moderna}
+
+Antes de la llegada de HTML5, los desarrolladores maquetaban la totalidad de los sitios web anidando infinitos elementos genéricos \texttt{<div>} con identificadores o clases inventadas (\texttt{<div id="header">}, \texttt{<div class="menu">}, \texttt{<div id="sidebar">}), un fenómeno conocido en la profesión como \textbf{«divitis»}. Esto impedía que los motores de búsqueda y los lectores de accesibilidad comprendieran la estructura real de la página.
+
+HTML5 introdujo un conjunto canónico de \textbf{etiquetas semánticas estructurales} que describen con precisión el propósito de cada región:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  container/.style={draw=primary, thick, fill=bglight, rounded corners=4pt},
+  innerbox/.style={draw=secondary, thick, fill=white, rounded corners=3pt, font=\small\bfseries, align=center}
+]
+  % Contenedor exterior
+  \draw[container] (0,0) rectangle (11,8);
+  \node[anchor=north west, color=primary, font=\bfseries] at (0.2,7.8) {Documento HTML5 (body)};
+
+  % Header
+  \node[innerbox, minimum width=10.4cm, minimum height=1cm, fill=primary!15] at (5.5, 6.8) {header (Cabecera, logotipo, titulo del sitio)};
+
+  % Nav
+  \node[innerbox, minimum width=10.4cm, minimum height=0.7cm, fill=secondary!20] at (5.5, 5.7) {nav (Enlaces de navegacion principal)};
+
+  % Main (Contenedor central)
+  \draw[draw=accent, thick, dashed, fill=accent!5, rounded corners=3pt] (0.3, 1.3) rectangle (7.5, 5.1);
+  \node[anchor=north west, color=accent, font=\footnotesize\bfseries] at (0.5, 5.0) {main (Contenido principal unico del documento)};
+
+  % Articulos dentro de main
+  \node[innerbox, minimum width=6.6cm, minimum height=1.3cm] at (3.9, 3.9) {article\\[2pt]\normalfont\footnotesize Contenido autonomo y reutilizable};
+  \node[innerbox, minimum width=6.6cm, minimum height=1.3cm] at (3.9, 2.2) {section\\[2pt]\normalfont\footnotesize Seccion tematica de la pagina};
+
+  % Aside (Barra lateral)
+  \node[innerbox, minimum width=2.8cm, minimum height=3.8cm, fill=bglight] at (9.3, 3.2) {aside\\[2pt]\normalfont\footnotesize Barra lateral,\\enlaces,\\publicidad};
+
+  % Footer
+  \node[innerbox, minimum width=10.4cm, minimum height=0.8cm, fill=textdark!15] at (5.5, 0.7) {footer (Pie de pagina, copyright, politicas legales)};
+\end{tikzpicture}
+\caption{Esquema visual de la arquitectura semántica en un documento HTML5.}
+\label{fig:html5-semantico}
+\end{figure}
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{\texttt{<header>}:} Cabecera introductoria de la página o de una sección individual. Suele contener el logo, título principal y barras de búsqueda.
+  \item \textbf{\texttt{<nav>}:} Bloque que contiene los enlaces de navegación fundamentales del sitio web.
+  \item \textbf{\texttt{<main>}:} Representa el contenido central y sustancial único de la página. \textbf{Solo puede existir un elemento \texttt{<main>} visible por documento} y no debe contener bloques repetitivos como cabeceras o pies de página globales.
+  \item \textbf{\texttt{<article>}:} Bloque de contenido independiente y autocontenido que tendría pleno sentido si se extrajera de la página y se leyera por separado (por ejemplo: un artículo de blog, una noticia, una tarjeta de producto o un comentario de un usuario).
+  \item \textbf{\texttt{<section>}:} Agrupación temática genérica de contenido. Cada \texttt{<section>} suele comenzar con su propio encabezado (\texttt{<h2>}--\texttt{<h6>}).
+  \item \textbf{\texttt{<aside>}:} Contenido tangencial o secundario respecto al flujo principal (barras laterales, enlaces a temas relacionados, publicidad).
+  \item \textbf{\texttt{<footer>}:} Pie de página que alberga información de autoría, derechos de copia (copyright), enlaces a políticas de privacidad y datos de contacto.
+\end{itemize}
+
+\subsection{Formularios Web Interactivos (\texttt{<form>})}
+
+Los formularios son el principal mecanismo nativo para que el usuario introduzca datos y preferencias que serán procesados por el servidor web o por JavaScript en el cliente.
+
+\begin{lstlisting}[language=HTML, caption={Formulario accesible y validado en HTML5.}]
+<form action="/api/v1/registro" method="POST" enctype="application/x-www-form-urlencoded">
+    <!-- Campo de texto con label asociado mediante id -->
+    <div>
+        <label for="nombreUsuario">Nombre de Usuario:</label>
+        <input type="text" id="nombreUsuario" name="username" required minlength="4" maxlength="20" placeholder="Ej. d_sticea">
+    </div>
+
+    <!-- Correo electronico con validacion nativa -->
+    <div>
+        <label for="correo">Correo Electronico:</label>
+        <input type="email" id="correo" name="email" required placeholder="usuario@dominio.com">
+    </div>
+
+    <!-- Contrasenia segura -->
+    <div>
+        <label for="clave">Contrasenia:</label>
+        <input type="password" id="clave" name="password" required minlength="8">
+    </div>
+
+    <!-- Selector desplegable -->
+    <div>
+        <label for="rol">Rol Profesional:</label>
+        <select id="rol" name="role">
+            <option value="dev">Desarrollador de Software</option>
+            <option value="qa">Ingeniero de QA / Testing</option>
+            <option value="devops">Especialista DevOps</option>
+        </select>
+    </div>
+
+    <!-- Botones de radio (exclusivos entre si por compartir el atributo name) -->
+    <fieldset>
+        <legend>Tipo de Suscripcion:</legend>
+        <label><input type="radio" name="plan" value="free" checked> Gratuita</label>
+        <label><input type="radio" name="plan" value="premium"> Premium</label>
+    </fieldset>
+
+    <!-- Casilla de verificacion (Checkbox) -->
+    <div>
+        <label>
+            <input type="checkbox" name="terminos" required>
+            Acepto los terminos y condiciones legales
+        </label>
+    </div>
+
+    <!-- Botones de accion -->
+    <button type="submit">Registrar Cuenta</button>
+    <button type="reset">Limpiar Formulario</button>
+</form>
+\end{lstlisting}
+
+\subsubsection{Conceptos Críticos de Formularios en Ingeniería}
+\begin{enumerate}
+  \item \textbf{Atributos \texttt{action} y \texttt{method}:} \texttt{action} especifica la URL del endpoint del servidor que recibirá los datos. \texttt{method} determina el verbo HTTP:
+    \begin{itemize}
+      \item \texttt{GET}: Concatena los datos del formulario directamente en la URL (\textit{query string}). Es visible en el historial y barra de navegación; \textbf{jamás debe usarse para contraseñas o datos sensibles}. Adecuado para motores de búsqueda o filtros.
+      \item \texttt{POST}: Envía los datos empaquetados en el cuerpo (\textit{body}) de la petición HTTP. Seguro y sin límites prácticos de longitud.
+    \end{itemize}
+  \item \textbf{El Atributo \texttt{enctype}:} Por defecto es \texttt{application/x-www-form-urlencoded}. Si el formulario incluye campos para subir archivos (\texttt{<input type="file">}), es \textbf{estrictamente obligatorio} cambiarlo a \texttt{multipart/form-data}.
+  \item \textbf{La Asociación Semántica con \texttt{<label for="...">}:} La etiqueta \texttt{<label>} debe vincularse mediante su atributo \texttt{for} al atributo \texttt{id} del \texttt{<input>}. Esto garantiza dos cosas:
+    \begin{itemize}
+      \item \textit{Accesibilidad:} Los lectores de pantalla anuncian la etiqueta cuando el cursor entra en el campo.
+      \item \textit{Usabilidad en Pantallas Táctiles:} Al pulsar con el dedo sobre el texto de la etiqueta, el campo de entrada recibe el foco automáticamente.
+    \end{itemize}
+  \item \textbf{El Atributo \texttt{name}:} Es el identificador clave que el servidor recibirá en el diccionario de datos. Un campo sin atributo \texttt{name} es completamente ignorado al enviar el formulario.
+  \item \textbf{Validación en Cliente vs. Servidor:}
+    HTML5 incluye validación nativa automática (\texttt{required}, \texttt{pattern}, \texttt{minlength}, \texttt{maxlength}, \texttt{type="email|number"}).\\
+    \begin{importante}{Máxima de Seguridad en Software}
+    La validación en cliente de HTML5 es una herramienta de usabilidad (\textit{UX}) para orientar al usuario rápidamente, pero \textbf{nunca constituye una medida de seguridad}. Un atacante puede desactivar JavaScript, modificar el HTML en las DevTools o emitir una petición HTTP manipulada mediante herramientas como \texttt{curl} o Postman. \textbf{La validación estricta y desinfección de todos los campos en el servidor backend es obligatoria e ineludible.}
+    \end{importante}
+\end{enumerate}
+
+\subsection{Elementos Genéricos: \texttt{<div>} y \texttt{<span>}}
+
+Cuando se requiere agrupar elementos únicamente para aplicar estilos CSS o comportamientos de JavaScript y ningún elemento semántico se ajusta a la naturaleza del bloque, se recurre a los elementos genéricos:
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{\texttt{<div>} (Division):} Elemento genérico de nivel de bloque (\textit{block-level}). Ocupa por defecto el 100\% del ancho disponible y genera un salto de línea antes y después.
+  \item \textbf{\texttt{<span>}:} Elemento genérico en línea (\textit{inline}). Solo ocupa el ancho estricto de su contenido y no altera el flujo horizontal del texto.
+\end{itemize}
+
+---
+
+\section{CSS3: Cascada, Box Model, Flexbox y Grid Layout}
+
+\subsection{Definición y Principios de CSS}
+
+\begin{definicion}{CSS (Cascading Style Sheets)}
+\textbf{CSS} es el lenguaje de hojas de estilo utilizado para describir la presentación visual, la maquetación espacial, los colores, tipografías y el comportamiento adaptativo de los documentos estructurados en HTML.
+\end{definicion}
+
+El principio fundacional de CSS es la \textbf{separación radical de responsabilidades}: HTML define \textit{qué} información existe en la página, mientras que CSS define \textit{cómo} se visualiza dicha información en cualquier pantalla (móvil, tableta, monitor ultra-panorámico o impresora).
+
+\subsection{Métodos de Inclusión de CSS}
+
+Existen tres formas de vincular código CSS a un documento HTML:
+
+\begin{enumerate}
+  \item \textbf{Estilos en Línea (Inline Styles):} Mediante el atributo \texttt{style} en cualquier etiqueta:
+  \begin{lstlisting}[language=HTML]
+  <p style="color: red; font-size: 16px;">Texto en rojo</p>
+  \end{lstlisting}
+  \textit{Veredicto de Ingeniería:} Pésima práctica. Viola el principio de separación, ensucia el HTML, no es reutilizable y posee una especificidad destructiva que dificulta el mantenimiento.
+  \item \textbf{Hojas de Estilo Internas:} Mediante la etiqueta \texttt{<style>} dentro del \texttt{<head>}:
+  \begin{lstlisting}[language=HTML]
+  <head>
+      <style>
+          p { color: #143462; }
+      </style>
+  </head>
+  \end{lstlisting}
+  \textit{Veredicto de Ingeniería:} Aceptable únicamente para prototipos rápidos, pruebas de concepto o plantillas de correo electrónico HTML (que requieren estilos incrustados).
+  \item \textbf{Hojas de Estilo Externas (El Estándar Profesional):} En un archivo independiente con extensión \texttt{.css} vinculado desde el \texttt{<head>}:
+  \begin{lstlisting}[language=HTML]
+  <head>
+      <link rel="stylesheet" href="css/estilos.css">
+  </head>
+  \end{lstlisting}
+  \textit{Veredicto de Ingeniería:} \textbf{La práctica recomendada por antonomasia}. Permite que múltiples páginas compartan las mismas reglas de estilo, facilita la división del trabajo y aprovecha los mecanismos de caché del navegador: una vez descargado el archivo CSS, no vuelve a pedirse a la red, acelerando enormemente la navegación.
+\end{enumerate}
+
+\subsection{Sintaxis de una Regla CSS}
+
+Toda regla CSS consta de dos partes: un \textbf{selector} que determina a qué elementos del DOM se aplicará la regla, y un \textbf{bloque de declaraciones} delimitado por llaves que contiene pares de propiedad y valor finalizados por punto y coma:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  box/.style={draw=primary, thick, fill=bglight, rounded corners=3pt, align=center, font=\small}
+]
+  \node[font=\Large\ttfamily] at (0,0) {
+    \textcolor{secondary}{\textbf{h1}} \textcolor{primary}{\{} \textcolor{accent}{color}\textcolor{primary}{:} \textcolor{strgreen}{\#143462}\textcolor{primary}{;} \textcolor{accent}{font-size}\textcolor{primary}{:} \textcolor{strgreen}{2.5rem}\textcolor{primary}{;} \textcolor{primary}{\}}
+  };
+  
+  \node[box, above=0.7cm of {(-2.5,0)}] (sel) {\textbf{Selector}\\(Indica qué elemento)};
+  \draw[->, thick, secondary] (sel) -- (-2.4, 0.4);
+  
+  \node[box, below=0.7cm of {(0.8,0)}] (prop) {\textbf{Propiedades}\\(Qué aspecto cambiar)};
+  \draw[->, thick, accent] (prop) -- (0.0, -0.4);
+  \draw[->, thick, accent] (prop) -- (1.8, -0.4);
+  
+  \node[box, above=0.7cm of {(2.2,0)}] (val) {\textbf{Valores}\\(Nuevo valor asignado)};
+  \draw[->, thick, strgreen] (val) -- (1.2, 0.4);
+  \draw[->, thick, strgreen] (val) -- (3.2, 0.4);
+\end{tikzpicture}
+\caption{Anatomía formal de una regla CSS.}
+\label{fig:sintaxis-css}
+\end{figure}
+
+\subsection{El Algoritmo de la Cascada, Especificidad y Herencia}
+
+¿Qué ocurre si a un mismo elemento HTML le aplican múltiples reglas CSS contradictorias? El motor del navegador resuelve el conflicto ejecutando el algoritmo formal de la \textbf{Cascada}, sustentado en tres pilares:
+
+\subsubsection{1. Origen e Importancia de la Regla}
+El navegador ordena las reglas según su origen en orden ascendente: estilos del navegador por defecto $\rightarrow$ estilos del usuario $\rightarrow$ estilos del autor (nuestro archivo CSS). Si se añade la directiva \texttt{!important} a una declaración, esta salta por encima de todas las demás reglas ordinarias.
+\begin{importante}{Antipatrón de Ingeniería: El Abuso de !important}
+El uso indiscriminado de \texttt{!important} destruye el flujo natural de la cascada y desencadena guerras de especificidad donde cada regla nueva necesita otro \texttt{!important} para sobrescribir la anterior. En código profesional, su uso está restringido a casos de fuerza mayor (como sobreescrituras en utilidades aisladas de accesibilidad).
+\end{importante}
+
+\subsubsection{2. La Fórmula de la Especificidad}
+Si dos reglas tienen el mismo origen, el conflicto se desempata mediante el cálculo matemático de la \textbf{especificidad}, representada como una tupla de cuatro columnas $(a, b, c, d)$:
+
+\begin{table}[htbp]
+\centering
+\caption{Cálculo de la especificidad en CSS.}
+\label{tab:especificidad-css}
+\begin{tabularx}{\textwidth}{c l X l}
+\toprule
+\textbf{Columna} & \textbf{Tipo de Selector} & \textbf{Ejemplos} & \textbf{Puntuación} \\
+\midrule
+$a$ & Estilos en línea & \texttt{style="..."} & $(1, 0, 0, 0)$ \\
+$b$ & Selectores de ID & \texttt{\#menu-principal}, \texttt{\#cabecera} & $(0, 1, 0, 0)$ \\
+$c$ & Clases, atributos y pseudoclases & \texttt{.btn}, \texttt{[type="text"]}, \texttt{:hover} & $(0, 0, 1, 0)$ \\
+$d$ & Elementos y pseudoelementos & \texttt{h1}, \texttt{div}, \texttt{p}, \texttt{::before} & $(0, 0, 0, 1)$ \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+La comparación se realiza estrictamente de izquierda a derecha: una regla con un ID $(0, 1, 0, 0)$ vence a una regla con mil clases juntas $(0, 0, 1000, 0)$.
+
+\subsubsection{3. Orden de Aparición en el Código}
+Si dos reglas tienen exactamente la misma especificidad, gana \textbf{la última regla declarada en el código fuente} (el navegador lee secuencialmente de arriba abajo).
+
+\subsection{Colores y Variables CSS (Custom Properties)}
+
+CSS admite múltiples formas de especificar valores cromáticos:
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Nombres de Color:} 140 nombres predefinidos (ej. \texttt{blue}, \texttt{red}, \texttt{steelblue}). Adecuados solo para pruebas rápidas.
+  \item \textbf{Hexadecimal:} Formato \texttt{\#RRGGBB} o compacto \texttt{\#RGB} (donde cada canal varía de \texttt{00} a \texttt{FF}). Admite un cuarto canal de transparencia opcional: \texttt{\#RRGGBBAA}.
+  \item \textbf{Notación Funcional RGB / RGBA:} \texttt{rgb(255, 0, 0)} o \texttt{rgba(20, 52, 98, 0.85)} (donano el valor alfa varía de 0 totalmente transparente a 1 opaco).
+  \item \textbf{Notación HSL / HSLA:} \texttt{hsl(hue, saturation, lightness)}. Tono (0 a 360 grados en el círculo cromático), Saturación (0\% gris a 100\% color puro) y Luminosidad (0\% negro a 100\% blanco). Es el formato predilecto de los diseñadores porque permite crear paletas armónicas variando solo la luminosidad.
+\end{itemize}
+
+\begin{lstlisting}[language=css, caption={Declaración y uso de variables nativas en CSS3.}]
+/* Declaracion en el nodo raiz para alcance global */
+:root {
+    --color-primary: #143462;
+    --color-accent: #d97706;
+    --spacing-base: 1rem;
+    --font-heading: 'Inter', sans-serif;
+}
+
+/* Uso dinamico en cualquier selector */
+.btn-primary {
+    background-color: var(--color-primary);
+    color: white;
+    padding: var(--spacing-base);
+    font-family: var(--font-heading);
+    transition: background-color 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-accent);
+}
+\end{lstlisting}
+
+\subsection{Tipografía, Fuentes y Unidades de Medida}
+
+\subsubsection{Pilas Tipográficas (*Font Stacks*) y Google Fonts}
+La propiedad \texttt{font-family} define la lista de fuentes a utilizar. Como no todas las máquinas tienen las mismas fuentes instaladas, se define una lista de reserva que culmina en una familia genérica del sistema:
+\begin{lstlisting}[language=css]
+body {
+    /* Intenta cargar Inter; si no esta, busca Helvetica; si no, la sans-serif del sistema */
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+}
+\end{lstlisting}
+Para utilizar fuentes web modernas de alta calidad, se utiliza \textbf{Google Fonts}, descargando la tipografía en la cabecera HTML mediante:
+\begin{lstlisting}[language=HTML]
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+\end{lstlisting}
+
+\subsubsection{Unidades Absolutas vs. Relativas}
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Unidades Absolutas (\texttt{px}, \texttt{pt}):} \texttt{px} representa píxeles lógicos CSS. No varían en función de la configuración del usuario.
+  \item \textbf{Unidades Relativas a Fuentes (\texttt{em} vs. \texttt{rem}):}
+    \begin{itemize}
+      \item \texttt{em}: Es relativo al \texttt{font-size} del elemento padre inmediato. Es propenso a efectos multiplicativos indeseados en estructuras anidadas.
+      \item \textbf{\texttt{rem} (Root EM):} Es relativo únicamente al tamaño de fuente definido en el elemento raíz (\texttt{<html>}, por defecto 16px en todos los navegadores). Por tanto, \texttt{1rem = 16px}, \texttt{1.5rem = 24px}, \texttt{2rem = 32px}.\\
+      \begin{importante}{Por qué rem es el Estándar de Accesibilidad}
+      Si un usuario con problemas de visión configura el tamaño de fuente predeterminado de su navegador en 24px en lugar de 16px, una página maquetada con \texttt{rem} escalará armónicamente todos los textos, márgenes y botones de manera automática. Una página maquetada rígidamente en \texttt{px} ignorará la preferencia del usuario, rompiendo la accesibilidad.
+      \end{importante}
+    \end{itemize}
+  \item \textbf{Unidades de Ventana Gráfica (Viewport Units):}
+    \begin{itemize}
+      \item \texttt{1vw}: El 1\% del ancho total de la ventana visible del navegador.
+      \item \texttt{1vh}: El 1\% de la altura total de la ventana visible.
+    \end{itemize}
+\end{itemize}
+
+\subsection{El Modelo de Caja (*Box Model*)}
+
+En CSS, todo elemento del DOM es concebido por el motor de renderizado como una caja rectangular compuesta por cuatro capas concéntricas:
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[scale=0.95, every node/.style={transform shape}]
+  % Margin
+  \draw[draw=accent, thick, fill=accent!15, rounded corners=6pt] (-5,-3.2) rectangle (5,3.2);
+  \node[anchor=north west, font=\bfseries\color{accent}] at (-4.8, 3.0) {MARGIN (Margen exterior invisible)};
+
+  % Border
+  \draw[draw=primary, thick, fill=primary!20, rounded corners=5pt] (-4.2,-2.4) rectangle (4.2,2.4);
+  \node[anchor=north west, font=\bfseries\color{primary}] at (-4.0, 2.2) {BORDER (Borde)};
+
+  % Padding
+  \draw[draw=secondary, thick, fill=secondary!20, rounded corners=4pt] (-3.4,-1.6) rectangle (3.4,1.6);
+  \node[anchor=north west, font=\bfseries\color{secondary}] at (-3.2, 1.4) {PADDING (Relleno interno)};
+
+  % Content
+  \draw[draw=strgreen, thick, fill=white, rounded corners=3pt] (-2.2,-0.8) rectangle (2.2,0.8);
+  \node[font=\bfseries\color{strgreen}, align=center] at (0,0) {CONTENIDO\\{\footnotesize (Texto, imagenes, video)}};
+\end{tikzpicture}
+\caption{Capas concéntricas del Modelo de Caja en CSS.}
+\label{fig:box-model}
+\end{figure}
+
+\begin{enumerate}
+  \item \textbf{Content (Contenido):} El área real donde se dibuja el texto o las imágenes.
+  \item \textbf{Padding (Relleno):} Espacio transparente interior entre el contenido y el borde. Hereda el color de fondo del elemento.
+  \item \textbf{Border (Borde):} Línea que delimita el elemento. Posee grosor, estilo (\texttt{solid}, \texttt{dashed}) y color.
+  \item \textbf{Margin (Margen):} Espacio exterior transparente que separa el elemento de sus vecinos.
+\end{enumerate}
+
+\begin{importante}{El Reseteo Universal Obligatorio: content-box vs. border-box}
+Por defecto histórico, el modelo de caja de CSS es \texttt{box-sizing: content-box}. En este modo, si definimos \texttt{width: 300px; padding: 20px; border: 5px solid black;}, el ancho total real que ocupará la caja en la pantalla será:
+\[
+\text{Ancho Total} = 300 + (2 \times 20) + (2 \times 5) = 350\text{px}
+\]
+Esto causaba que añadir padding rompiera continuamente las maquetaciones calculadas en columnas porcentuales.\\
+Para solucionar esto de raíz, la industria del software utiliza universalmente el siguiente \textbf{reseteo en la primera línea de todo archivo CSS}:
+\begin{lstlisting}[language=css]
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+\end{lstlisting}
+Con \texttt{border-box}, el ancho declarado (\texttt{width: 300px}) pasa a ser la dimensión exterior total fija; el padding y el borde se descuentan automáticamente hacia adentro, facilitando enormemente el cálculo mental y espacial.
+\end{importante}
+
+\subsection{Catálogo Avanzado de Selectores CSS}
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Selector Universal (\texttt{*}):} Selecciona todos y cada uno de los elementos de la página.
+  \item \textbf{Selectores Básicos:} Por etiqueta (\texttt{p}), por clase (\texttt{.destacado}) y por ID único (\texttt{\#cabecera}).
+  \item \textbf{Combinadores Jerárquicos:}
+    \begin{itemize}
+      \item \textit{Descendiente (\texttt{A B}):} Selecciona cualquier elemento \texttt{B} que esté dentro de \texttt{A}, sin importar la profundidad del anidamiento.
+      \item \textit{Hijo Directo (\texttt{A > B}):} Selecciona elementos \texttt{B} que sean hijos directos e inmediatos de \texttt{A}.
+      \item \textit{Hermano Adyacente (\texttt{A + B}):} Selecciona el elemento \texttt{B} que esté inmediatamente a continuación de \texttt{A} al mismo nivel jerárquico.
+      \item \textit{Hermano General (\texttt{A \~{} B}):} Selecciona todos los hermanos \texttt{B} que sigan a \texttt{A} compartiendo el mismo elemento padre.
+    \end{itemize}
+  \item \textbf{Selectores de Atributo:}
+    \begin{itemize}
+      \item \texttt{[target]}: Elementos que posean dicho atributo.
+      \item \texttt{[type="button"]}: Coincidencia exacta de valor.
+      \item \texttt{[href\^{}="https"]}: Cuyo valor comience por dicha cadena.
+      \item \texttt{[src\$=".png"]}: Cuyo valor termine por dicha extensión.
+      \item \texttt{[class*="btn-"]}: Cuyo valor contenga la subcadena indicada.
+    \end{itemize}
+  \item \textbf{Pseudoclases Esenciales:}
+    \begin{itemize}
+      \item \textit{De Interacción y Estado:} \texttt{:hover} (ratón encima), \texttt{:active} (momento exacto del clic presionado), \texttt{:focus} (elemento con foco activo del teclado o cursor), \texttt{:visited} (enlace ya visitado previamente).
+      \item \textit{Estructurales:} \texttt{:first-child}, \texttt{:last-child}, \texttt{:nth-child(even)} (filas pares), \texttt{:nth-child(2n+1)} (filas impares), \texttt{:not(.excluido)}.
+    \end{itemize}
+  \item \textbf{Pseudoelementos:} Permiten dar estilo a fragmentos abstractos del elemento o insertar contenido decorativo sin alterar el HTML: \texttt{::before} y \texttt{::after} (obligan a definir la propiedad \texttt{content: ""}), \texttt{::selection} (color de selección de texto del usuario).
+\end{itemize}
+
+\subsection{Comportamiento de Visualización: La Propiedad \texttt{display}}
+
+La propiedad \texttt{display} determina cómo interactúa la caja en el flujo normal del documento:
+\begin{itemize}[leftmargin=1.2cm]
+  \item \texttt{display: block}: Ocupa todo el ancho horizontal disponible forzando saltos de línea. Respeta \texttt{width}, \texttt{height}, \texttt{margin} y \texttt{padding} en los cuatro lados (ej. \texttt{<div>}, \texttt{<p>}, \texttt{<h1>}).
+  \item \texttt{display: inline}: Fluye de forma natural en la misma línea que el texto. Ignora las propiedades \texttt{width} y \texttt{height}; los márgenes verticales no desplazan a los elementos adyacentes (ej. \texttt{<span>}, \texttt{<a>}, \texttt{<strong>}).
+  \item \texttt{display: inline-block}: El híbrido perfecto. Se alinea horizontalmente en la misma línea que otros elementos, pero \textbf{respeta escrupulosamente las dimensiones declaradas de anchura, altura y márgenes}. Ideal para botones o tarjetas en línea.
+  \item \texttt{display: none}: Elimina completamente el elemento del árbol de renderizado. No ocupa ningún espacio visual en pantalla.
+\end{itemize}
+
+\subsection{Posicionamiento Tradicional (\texttt{position})}
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \texttt{position: static}: El valor por defecto. El elemento sigue el flujo normal del documento. Ignora las propiedades de coordenadas (\texttt{top}, \texttt{left}, \texttt{right}, \texttt{bottom}, \texttt{z-index}).
+  \item \texttt{position: relative}: Se desplaza respecto a la posición natural que le correspondía originalmente, \textbf{pero preserva el hueco vacío original en el flujo}, sin mover a los elementos vecinos.
+  \item \texttt{position: absolute}: Se desvincula por completo del flujo normal y se posiciona de forma exacta respecto a las coordenadas del \textbf{ancestro posicionado más cercano} (cualquier contenedor previo que tenga una posición distinta a \texttt{static}). Si no existe tal ancestro, se posiciona respecto al área de visualización inicial (\texttt{<html>}).
+  \item \texttt{position: fixed}: Queda fijado rígidamente a la ventana gráfica del navegador (\textit{viewport}). No se desplaza aunque el usuario haga scroll vertical en la página (ideal para barras de navegación superiores permanentes o botones flotantes de chat).
+  \item \texttt{position: sticky}: Actúa como \texttt{relative} durante el scroll ordinario hasta que cruza un umbral específico de coordenadas (ej. \texttt{top: 0}), instante en el cual se «adhiere» permanentemente a la pantalla comportándose como \texttt{fixed}.
+  \item \textbf{Índice de Profundidad (\texttt{z-index}):} Entero que especifica el orden de apilamiento tridimensional hacia el usuario de elementos posicionados. Requiere una posición distinta de \texttt{static}.
+\end{itemize}
+
+\subsection{Maquetación Moderna 1: Flexbox (Flexible Box Layout)}
+
+\begin{definicion}{Flexbox}
+Flexbox es un modelo de maquetación unidimensional diseñado para distribuir eficientemente el espacio libre entre elementos y alinearlos de forma flexible a lo largo de un único eje rector (el \textbf{eje principal}), adaptándose a cualquier tamaño de pantalla.
+\end{definicion}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  container/.style={draw=primary, thick, fill=bglight, rounded corners=4pt},
+  item/.style={draw=secondary, thick, fill=secondary!20, rounded corners=3pt, minimum width=1.5cm, minimum height=1.2cm, font=\bfseries}
+]
+  \draw[container] (0,0) rectangle (10.5,3.5);
+  \node[anchor=north west, color=primary, font=\bfseries] at (0.2,3.3) {Contenedor Flexible (display: flex)};
+
+  % Ejes
+  \draw[->, very thick, color=accent] (0.5, 2.4) -- (10.0, 2.4) node[midway, above, font=\small\bfseries] {EJE PRINCIPAL (Main Axis $\rightarrow$ justify-content)};
+  \draw[->, very thick, color=strgreen] (0.8, 2.6) -- (0.8, 0.4) node[midway, right, font=\small\bfseries] {EJE SECUNDARIO (Cross Axis $\downarrow$ align-items)};
+
+  % Items
+  \node[item] at (2.5, 1.2) {Item 1};
+  \node[item] at (4.5, 1.2) {Item 2};
+  \node[item] at (6.5, 1.2) {Item 3};
+  \node[item] at (8.5, 1.2) {Item 4};
+\end{tikzpicture}
+\caption{Diagrama de ejes y alineación en Flexbox.}
+\label{fig:flexbox-ejes}
+\end{figure}
+
+\subsubsection{Propiedades del Contenedor (\texttt{display: flex})}
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{\texttt{flex-direction}:} Determina la orientación del eje principal:
+    \begin{itemize}
+      \item \texttt{row} (por defecto): Horizontal de izquierda a derecha.
+      \item \texttt{row-reverse}: Horizontal de derecha a izquierda.
+      \item \texttt{column}: Vertical de arriba a abajo.
+      \item \texttt{column-reverse}: Vertical de abajo a arriba.
+    \end{itemize}
+  \item \textbf{\texttt{flex-wrap}:} Controla si los elementos hijos deben mantenerse en una sola línea forzosa o pueden desbordar en múltiples filas:
+    \begin{itemize}
+      \item \texttt{nowrap} (por defecto): Todos los items se comprimen en una sola línea.
+      \item \texttt{wrap}: Los elementos que no caben saltan a la siguiente línea.
+      \item \texttt{wrap-reverse}: Salto de línea hacia arriba.
+    \end{itemize}
+  \item \textbf{\texttt{justify-content}:} Alinea y distribuye el espacio sobrante en el \textbf{eje principal}:
+    \begin{itemize}
+      \item \texttt{flex-start}: Alineados al inicio del eje.
+      \item \texttt{flex-end}: Alineados al final del eje.
+      \item \texttt{center}: Centrados en el eje principal.
+      \item \texttt{space-between}: El primer item pegado al inicio, el último al final, y espacio equidistante entre ellos.
+      \item \texttt{space-around}: Espacio igual a ambos lados de cada elemento (los extremos tienen la mitad de espacio que el hueco interior).
+      \item \texttt{space-evenly}: Espaciado matemáticamente idéntico entre todos los elementos y los bordes exteriores.
+    \end{itemize}
+  \item \textbf{\texttt{align-items}:} Alinea los elementos en el \textbf{eje secundario (cruzado)}:
+    \begin{itemize}
+      \item \texttt{stretch} (por defecto): Se estiran para ocupar todo el alto del contenedor.
+      \item \texttt{flex-start} / \texttt{flex-end}: Alineados al inicio o final del eje cruzado.
+      \item \texttt{center}: Centrado vertical perfecto en el eje secundario.
+      \item \texttt{baseline}: Alineados según la línea base de sus textos.
+    \end{itemize}
+  \item \textbf{\texttt{gap}:} La forma moderna y elegante de definir separación limpia entre elementos (\texttt{gap: 1.5rem;}), eliminando la necesidad de márgenes laterales complejos.
+\end{itemize}
+
+\subsubsection{Propiedades de los Elementos Hijos (Flex Items)}
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{\texttt{flex-grow}:} Factor de crecimiento proporcional para absorber el espacio disponible residual del contenedor (por defecto 0).
+  \item \textbf{\texttt{flex-shrink}:} Factor de contracción proporcional cuando el espacio es insuficiente (por defecto 1).
+  \item \textbf{\texttt{flex-basis}:} El tamaño base inicial del elemento antes de aplicar factores de crecimiento o contracción (ej. \texttt{flex-basis: 250px;}).
+  \item \textbf{Shorthand Canónico:} \texttt{flex: <grow> <shrink> <basis>;} (ejemplo habitual: \texttt{flex: 1 1 auto;}).
+  \item \textbf{\texttt{order}:} Modifica el orden visual de representación sin alterar el orden original del DOM HTML.
+\end{itemize}
+
+\subsection{Maquetación Moderna 2: CSS Grid Layout}
+
+\begin{definicion}{CSS Grid Layout}
+CSS Grid es el sistema de maquetación \textbf{bidimensional} más potente de CSS. A diferencia de Flexbox (que opera fundamentalmente en filas o columnas aisladas), Grid permite estructurar el espacio simultáneamente en filas y columnas ortogonales, asemejándose a una mesa de dibujo arquitectónico.
+\end{definicion}
+
+\begin{lstlisting}[language=css, caption={Configuración de una rejilla moderna con CSS Grid.}]
+.galeria-grid {
+    display: grid;
+    /* Crea columnas de al menos 250px que se expanden a partes iguales */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    grid-gap: 1.5rem;
+}
+
+.item-destacado {
+    /* Ocupa desde la columna 1 hasta la 3 */
+    grid-column: 1 / 3;
+    /* Ocupa 2 filas consecutivas */
+    grid-row: span 2;
+}
+\end{lstlisting}
+
+\subsubsection{Conceptos Fundamentales de Grid}
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Pistas de Cuadrícula (Grid Tracks):} Las filas o columnas individuales definidas con \texttt{grid-template-columns} y \texttt{grid-template-rows}.
+  \item \textbf{La Unidad de Fracción (\texttt{fr}):} Representa una fracción matemática del espacio libre restante dentro del contenedor de cuadrícula. Por ejemplo: \texttt{grid-template-columns: 1fr 2fr 1fr;} divide el ancho en 4 partes iguales, asignando la mitad del espacio total a la columna central.
+  \item \textbf{Funciones Auxiliares Potentes:}
+    \begin{itemize}
+      \item \texttt{repeat(3, 1fr)}: Evita repetir valores idénticos (\texttt{1fr 1fr 1fr}).
+      \item \texttt{minmax(min, max)}: Garantiza que una pista nunca baje de un mínimo ni supere un máximo.
+      \item \texttt{auto-fit} con \texttt{minmax}: Permite crear cuadrículas responsivas que se reorganizan solas según el tamaño de la pantalla \textbf{sin necesidad de escribir una sola media query}.
+    \end{itemize}
+  \item \textbf{Maquetación Visual por Áreas (\texttt{grid-template-areas}):} Permite maquetar el sitio entero «dibujando» literalmente su estructura en código ASCII:
+  \begin{lstlisting}[language=css]
+  .layout-pagina {
+      display: grid;
+      grid-template-areas:
+          "header  header"
+          "sidebar main"
+          "footer  footer";
+      grid-template-columns: 250px 1fr;
+  }
+  .header  { grid-area: header; }
+  .sidebar { grid-area: sidebar; }
+  .main    { grid-area: main; }
+  .footer  { grid-area: footer; }
+  \end{lstlisting}
+\end{itemize}
+
+\begin{table}[htbp]
+\centering
+\caption{Criterios de decisión en ingeniería: Flexbox vs. CSS Grid.}
+\label{tab:flexbox-vs-grid}
+\begin{tabularx}{\textwidth}{p{3.2cm} X X}
+\toprule
+\textbf{Criterio de Diseño} & \textbf{Flexbox (Flexible Box Layout)} & \textbf{CSS Grid Layout} \\
+\midrule
+\textbf{Dimensionalidad} & Unidimensional (Fila \textbf{o} Columna). & Bidimensional (Filas \textbf{y} Columnas simultáneas). \\
+\textbf{Enfoque de Diseño} & Basado en el \textbf{contenido}: los elementos definen su propio tamaño y se adaptan fluidamente. & Basado en la \textbf{estructura}: se define la cuadrícula primero y los elementos se ubican en ella. \\
+\textbf{Casos de Uso Típicos} & Barras de navegación, grupos de botones, alineación vertical de un icono con un texto, tarjetas en carrusel. & Maquetación global de páginas completas, dashboards de analítica, galerías de fotos tipo mosaico irregular. \\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+---
+
+\section{Bootstrap 5: Framework Front-End para Diseño Rápido}
+
+\subsection{Definición, Filosofía y Evolución}
+
+\begin{definicion}{Bootstrap}
+\textbf{Bootstrap} es el framework de código abierto (bajo licencia permisiva MIT) más extendido a nivel global para el diseño rápido, estructurado y adaptable a dispositivos móviles de interfaces web front-end. Fue creado originalmente en Twitter por Mark Otto y Jacob Thornton.
+\end{definicion}
+
+Más de dos millones de sitios web a nivel internacional se construyen con Bootstrap. La versión actual, \textbf{Bootstrap 5}, introdujo una profunda revolución técnica respecto a versiones históricas:
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Eliminación Total de jQuery:} Bootstrap 5 reescribió todos sus componentes interactivos (modales, tooltips, acordeones) en \textbf{JavaScript puro (Vanilla JS)}, reduciendo drásticamente el peso de la página y mejorando el rendimiento.
+  \item \textbf{Integración Nativa de Popper.js:} Motor robusto para el posicionamiento matemático de menús desplegables y tooltips.
+  \item \textbf{Adopción Masiva de Variables CSS:} Permite cambiar dinámicamente colores temáticos en tiempo de ejecución.
+  \item \textbf{Soporte Nativo de Modo Oscuro (*Dark Mode*):} Implementado fácilmente mediante el atributo HTML \texttt{data-bs-theme="dark"}.
+\end{itemize}
+
+\subsection{Inclusión de Bootstrap en Proyectos}
+
+La manera más rápida y eficiente de integrar Bootstrap 5 en producción es mediante su red de distribución de contenidos (\textbf{CDN}):
+
+\begin{lstlisting}[language=HTML, caption={Plantilla canónica inicial con Bootstrap 5.3 CDN.}]
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sitio Profesional con Bootstrap 5</title>
+    <!-- 1. CSS de Bootstrap -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- 2. Iconos Oficiales de Bootstrap -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="display-4 text-primary">¡Hola con Bootstrap 5!</h1>
+    </div>
+
+    <!-- 3. Bundle JS de Bootstrap (incluye Popper.js de forma integrada) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+\end{lstlisting}
+
+\subsection{El Sistema de Maquetación: Contenedores y Grid de 12 Columnas}
+
+El corazón arquitectónico de Bootstrap es su sistema de maquetación responsivo basado en \textbf{Flexbox}:
+
+\subsubsection{1. Contenedores (\texttt{.container} vs \texttt{.container-fluid})}
+El contenedor es el elemento padre obligatorio que envuelve y centra la cuadrícula:
+\begin{itemize}[leftmargin=1.2cm]
+  \item \texttt{.container}: Ancho responsivo fijo que salta a un ancho determinado al alcanzar cada punto de interrupción (*breakpoint*), manteniendo márgenes automáticos centrados en pantalla.
+  \item \texttt{.container-fluid}: Ocupa el 100\% del ancho de la pantalla de forma continua y fluida en cualquier resolución.
+\end{itemize}
+
+\subsubsection{2. Los Breakpoints Oficiales de Bootstrap 5}
+Bootstrap define seis puntos de corte estándar basados en el ancho mínimo en píxeles:
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Extra Pequeño (\texttt{xs}):} $<576\text{px}$ (móviles verticales, sin infijo de clase: \texttt{.col-12}).
+  \item \textbf{Pequeño (\texttt{sm}):} $\ge 576\text{px}$ (móviles apaisados / pantallas pequeñas).
+  \item \textbf{Medio (\texttt{md}):} $\ge 768\text{px}$ (tabletas verticales).
+  \item \textbf{Grande (\texttt{lg}):} $\ge 992\text{px}$ (portátiles y ordenadores de escritorio estándar).
+  \item \textbf{Extra Grande (\texttt{xl}):} $\ge 1200\text{px}$ (monitores de alta resolución).
+  \item \textbf{Extra Extra Grande (\texttt{xxl}):} $\ge 1400\text{px}$ (pantallas ultrapanorámicas de gran formato).
+\end{itemize}
+
+\subsubsection{3. La Jerarquía Sagrada: Container $\rightarrow$ Row $\rightarrow$ Col}
+\begin{importante}{Regla Estructural Inviolable en Bootstrap}
+En Bootstrap, \textbf{las filas (\texttt{.row}) deben ser hijas directas de un contenedor (\texttt{.container})}, y \textbf{las columnas (\texttt{.col-*}) deben ser hijas directas e inmediatas de una fila (\texttt{.row})}.\\
+Una fila aplica márgenes negativos para compensar el padding horizontal de las columnas (*gutters*). Colocar contenido directamente dentro de un \texttt{.row} sin una columna que lo envuelva destruye la alineación matemática de la rejilla.
+\end{importante}
+
+El sistema divide la pantalla horizontalmente en \textbf{12 columnas virtuales}. Los elementos declaran cuántas columnas ocupan mediante clases del tipo \texttt{.col-\{breakpoint\}-\{número\}}:
+
+\begin{lstlisting}[language=HTML, caption={Ejemplo del sistema Grid adaptable a múltiples pantallas.}]
+<div class="container">
+    <div class="row g-4">
+        <!-- En movil ocupa 12 columnas (100%), en tablet 6 (50%) y en escritorio 4 (33.3%) -->
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="p-3 bg-light border rounded">Columna 1</div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="p-3 bg-light border rounded">Columna 2</div>
+        </div>
+        <div class="col-12 col-md-6 col-lg-4">
+            <div class="p-3 bg-light border rounded">Columna 3</div>
+        </div>
+    </div>
+</div>
+\end{lstlisting}
+
+\subsection{Paleta Semántica de Colores y Tipografía}
+
+Bootstrap proporciona un sistema consistente de nombres semánticos que se aplica a textos (\texttt{text-*}) y fondos (\texttt{bg-*}):
+\begin{itemize}[leftmargin=1.2cm]
+  \item \texttt{primary} (azul corporativo), \texttt{secondary} (gris sobrio), \texttt{success} (verde éxito o confirmación), \texttt{danger} (rojo error o alerta crítica), \texttt{warning} (amarillo advertencia), \texttt{info} (cian informativo), \texttt{light} (gris muy claro) y \texttt{dark} (antracita oscuro).
+  \item \textbf{Tipografía:} Clases de titulares display (\texttt{.display-1} a \texttt{.display-6}), textos destacados con \texttt{.lead}, textos secundarios con \texttt{.text-muted} o \texttt{.text-body-secondary}.
+\end{itemize}
+
+\subsection{Catálogo de Componentes UI Esenciales}
+
+\begin{itemize}[leftmargin=1.2cm]
+  \item \textbf{Botones (\texttt{.btn}):} Se combinan clases base y modificadores: \texttt{.btn .btn-primary}, versiones de contorno hueco \texttt{.btn-outline-danger}, tamaños \texttt{.btn-lg} o \texttt{.btn-sm}, y grupos cohesionados con \texttt{.btn-group}.
+  \item \textbf{Iconografía (Bootstrap Icons):} Más de 1.800 iconos vectoriales libres integrables fácilmente mediante clases CSS: \texttt{<i class="bi bi-person-check-fill"></i>}.
+  \item \textbf{Badges / Insignias (\texttt{.badge}):} Pequeñas etiquetas numéricas o de estado: \texttt{<span class="badge bg-success rounded-pill">Activo</span>}.
+  \item \textbf{Barras de Progreso (\texttt{.progress} y \texttt{.progress-bar}):}
+  \begin{lstlisting}[language=HTML]
+  <div class="progress" role="progressbar" aria-valuenow="75" aria-valuemin="0" aria-valuemax="100">
+      <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" style="width: 75%">75%</div>
+  </div>
+  \end{lstlisting}
+  \item \textbf{Paginación (\texttt{.pagination}):} Estructurada mediante listas \texttt{<ul class="pagination">} con elementos \texttt{.page-item} y enlaces \texttt{.page-link}, admitiendo estados \texttt{.active} y \texttt{.disabled}.
+  \item \textbf{Grupos de Listas (\texttt{.list-group}):} Componente flexible para presentar colecciones de elementos interactivos: \texttt{.list-group-item} y \texttt{.list-group-item-action}.
+  \item \textbf{Tablas Estilizadas:} Simplemente agregando clases nativas al elemento estándar \texttt{<table>}:
+    \begin{itemize}
+      \item \texttt{.table-striped}: Aplica un elegante sombreado estilo cebra a las filas alternas.
+      \item \texttt{.table-hover}: Efecto visual de realce al pasar el ratón por encima de cada fila.
+      \item \texttt{.table-bordered}: Cuadrícula completa con bordes limpios.
+      \item Envoltura \texttt{<div class="table-responsive">}: Garantiza que en pantallas móviles la tabla genere una barra de desplazamiento horizontal suave sin romper el diseño de la página.
+    \end{itemize}
+  \item \textbf{Formularios Responsivos en Bootstrap:}
+    \begin{itemize}
+      \item Controles de entrada: \texttt{.form-control} para campos de texto y contraseñas; \texttt{.form-select} para listas desplegables; \texttt{.form-check-input} para casillas y radios.
+      \item Grupos anexos (\texttt{.input-group}): Permite unir iconos o botones directamente pegados al campo de texto.
+      \item Validación visual instantánea: Las clases \texttt{.is-valid} e \texttt{.is-invalid} colorean automáticamente el borde en verde o rojo, mostrando los mensajes asociados en \texttt{.valid-feedback} o \texttt{.invalid-feedback}.
+    \end{itemize}
+  \item \textbf{Barra de Navegación Profesional (\texttt{.navbar}):}
+    El componente insignia de Bootstrap. Es completamente responsivo: en ordenadores de escritorio muestra los enlaces horizontales completos, mientras que en pantallas móviles colapsa automáticamente todos los enlaces dentro de un menú hamburguesa desplegable mediante el botón \texttt{.navbar-toggler}.
+\end{itemize}
+
+---
+
+\section{Ejercicios Prácticos Resueltos del Tema 2}
+
+A continuación se resuelven de forma íntegra y exhaustiva los ejercicios propuestos en el programa oficial de la asignatura.
+
+\subsection{Ejercicio 1 de HTML: Creación de Página Semántica sin Estilos}
+
+\begin{ejercicioresuelto}{Ejercicio 1 (HTML): Portal Institucional Semántico sin Estilos}
+\textbf{Enunciado Oficial:} \textit{Crea una página HTML (sin incluir estilos CSS). El contenido debe incluir, al menos: varias secciones y subsecciones, fotografías/imágenes con atributo alt, listas de elementos, tablas de datos e hiperenlaces (externos y anclas a la misma página).}
+
+\textbf{Solución de Ingeniería:} Se implementa una página web corporativa estructurada para una empresa de software (\textit{CloudPulse Technologies}), respetando la semántica de HTML5, accesibilidad universal y las mejores prácticas de la industria.
+
+\begin{lstlisting}[language=HTML, caption={index\_semantico.html: Solución completa al Ejercicio 1 de HTML.}]
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Portal corporativo de CloudPulse Technologies - Soluciones de Software">
+    <title>CloudPulse Technologies | Soluciones Cloud y Desarrollo Web</title>
+</head>
+<body>
+
+    <!-- Encabezado y Navegacion Principal -->
+    <header>
+        <h1>CloudPulse Technologies S.L.</h1>
+        <p>Innovacion, Arquitectura de Software y Sistemas Distribuidos</p>
+        <nav>
+            <ul>
+                <li><a href="#servicios">Nuestros Servicios</a></li>
+                <li><a href="#productos">Planes y Precios</a></li>
+                <li><a href="#contacto">Formulario de Contacto</a></li>
+                <li><a href="https://www.urjc.es" target="_blank" rel="noopener noreferrer">Convenio Academico URJC</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Contenido Principal Unico -->
+    <main>
+        <!-- Seccion 1: Presentacion y Servicios -->
+        <section id="servicios">
+            <h2>Servicios de Ingenieria del Software</h2>
+            <p>Diseniamos e implementamos plataformas digitales de alta escalabilidad con tecnologias modernas.</p>
+            
+            <figure>
+                <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?w=600" 
+                     alt="Circuito integrado representando procesamiento y arquitectura de sistemas distribuidos" 
+                     width="600" height="300">
+                <figcaption>Infraestructura global optimizada para baja latencia.</figcaption>
+            </figure>
+
+            <h3>Areas de Especializacion Tecnica</h3>
+            <ul>
+                <li><strong>Desarrollo Front-End:</strong> Aplicaciones SPA con React, Angular y maquetacion semantica con HTML5/CSS3.</li>
+                <li><strong>Arquitectura Back-End:</strong> Microservicios en Java Spring Boot, Node.js y APIs RESTful.</li>
+                <li><strong>Bases de Datos Distribuidas:</strong> Persistencia hibrida relacional (PostgreSQL) y NoSQL (Redis, MongoDB).</li>
+            </ul>
+        </section>
+
+        <!-- Seccion 2: Tabla de Productos y Precios -->
+        <section id="productos">
+            <h2>Planes y Modelos de Servicio</h2>
+            <table>
+                <caption>Matriz comparativa de planes de suscripcion CloudPulse 2026</caption>
+                <thead>
+                    <tr>
+                        <th scope="col">Plan</th>
+                        <th scope="col">Capacidad Compute</th>
+                        <th scope="col">Almacenamiento</th>
+                        <th scope="col">SLA Garantizado</th>
+                        <th scope="col">Precio Mensual</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <th scope="row">Developer</th>
+                        <td>2 vCPUs / 4 GB RAM</td>
+                        <td>50 GB NVMe</td>
+                        <td>99.5%</td>
+                        <td>29.00 EUR</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Enterprise Pro</th>
+                        <td>8 vCPUs / 32 GB RAM</td>
+                        <td>500 GB NVMe</td>
+                        <td>99.99%</td>
+                        <td>199.00 EUR</td>
+                    </tr>
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th scope="row" colspan="4">Descuento Anual por Contratacion Anticipada</th>
+                        <td>-20%</td>
+                    </tr>
+                </tfoot>
+            </table>
+        </section>
+
+        <!-- Seccion 3: Formulario de Contacto -->
+        <section id="contacto">
+            <h2>Solicitud de Informacion y Presupuesto</h2>
+            <form action="/api/solicitudes" method="POST">
+                <div>
+                    <label for="clienteNombre">Nombre y Apellidos:</label>
+                    <input type="text" id="clienteNombre" name="nombre" required minlength="3">
+                </div>
+                <div>
+                    <label for="clienteEmail">Correo Corporativo:</label>
+                    <input type="email" id="clienteEmail" name="email" required>
+                </div>
+                <div>
+                    <label for="tipoProyecto">Tipo de Proyecto:</label>
+                    <select id="tipoProyecto" name="proyecto">
+                        <option value="web">Desarrollo Web a Medida</option>
+                        <option value="cloud">Migracion Cloud y DevOps</option>
+                        <option value="auditoria">Auditoria de Rendimiento y Seguridad</option>
+                    </select>
+                </div>
+                <div>
+                    <label for="mensaje">Detalles del Proyecto:</label><br>
+                    <textarea id="mensaje" name="descripcion" rows="4" cols="50" placeholder="Describa brevemente los requisitos tecnicos..."></textarea>
+                </div>
+                <button type="submit">Enviar Solicitud</button>
+            </form>
+        </section>
+    </main>
+
+    <!-- Pie de Pagina -->
+    <footer>
+        <p>&copy; 2026 CloudPulse Technologies S.L. - Todos los derechos reservados.</p>
+        <p><a href="#servicios">Volver al inicio de la pagina</a></p>
+    </footer>
+
+</body>
+</html>
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\newpage
+
+\subsection{Ejercicios Resueltos de CSS}
+
+\begin{ejercicioresuelto}{Ejercicio 1 (CSS): Creación de un Botón Interactivo con Bordes Redondeados}
+\textbf{Enunciado Oficial:} \textit{Crea una página web con HTML y CSS que implemente un botón estilizado con bordes redondeados y efectos interactivos.}
+
+\textbf{Solución de Ingeniería:} Se modela una estructura limpia utilizando la etiqueta semántica \texttt{<a>} con apariencia de botón interactivo mediante clases CSS, transiciones suaves y estados pseudo-clase \texttt{:hover} y \texttt{:active}.
+
+\begin{lstlisting}[language=HTML, caption={Estructura HTML del botón.}]
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Boton Interactivo con CSS3</title>
+    <link rel="stylesheet" href="button.css">
+</head>
+<body>
+    <div class="contenedor-demo">
+        <a href="https://www.urjc.es" class="btn-custom">Descubrir Grado</a>
+    </div>
+</body>
+</html>
+\end{lstlisting}
+
+\begin{lstlisting}[language=css, caption={button.css: Estilos CSS del botón con bordes redondeados.}]
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f8fafc;
+}
+
+.btn-custom {
+    display: inline-block;
+    padding: 14px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    text-decoration: none;
+    text-align: center;
+    color: #ffffff;
+    background-color: #143462; /* Azul corporativo */
+    border: 2px solid #143462;
+    border-radius: 30px;        /* Bordes completamente redondeados */
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    transition: all 0.25s ease-in-out;
+    cursor: pointer;
+}
+
+/* Efecto al pasar el cursor */
+.btn-custom:hover {
+    background-color: #d97706; /* Transicion a ambar */
+    border-color: #d97706;
+    box-shadow: 0 10px 15px -3px rgba(217, 119, 6, 0.3);
+    transform: translateY(-2px); /* Ligero desplazamiento hacia arriba */
+}
+
+/* Efecto al hacer clic */
+.btn-custom:active {
+    transform: translateY(1px);
+    box-shadow: 0 2px 4px -1px rgba(0, 0, 0, 0.1);
+}
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\newpage
+
+\begin{ejercicioresuelto}{Ejercicio 2 (CSS): Replicación de Figura con Flexbox}
+\textbf{Enunciado Oficial:} \textit{Trata de replicar la siguiente figura utilizando Flexbox con un contenedor que aloja 10 items numerados.}
+
+\textbf{Solución Canónica Oficial:} El ejercicio evalúa la capacidad de comprender el flujo invertido de líneas con \texttt{flex-wrap: wrap-reverse}, la distribución en el eje principal con \texttt{space-around} y el centrado en el eje secundario con \texttt{align-items: center}.
+
+\begin{lstlisting}[language=css, caption={Solucion canonica al Ejercicio 2 de Flexbox.}]
+body {
+    padding-top: 1em;
+}
+
+.container {
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    flex-wrap: wrap-reverse;
+    background: steelblue;
+    width: 100px;
+    height: 100px;
+}
+
+.item {
+    background: grey;
+    min-height: 20px;
+    min-width: 20px;
+    border: 1px solid black;
+    text-align: center;
+    color: white;
+    font-size: 11px;
+    line-height: 20px;
+}
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\vspace{0.8cm}
+
+\begin{ejercicioresuelto}{Ejercicio 3 (CSS): Replicación de Distribución con CSS Grid}
+\textbf{Enunciado Oficial:} \textit{Trata de replicar la figura de 4 elementos coloreados utilizando CSS Grid.}
+
+\textbf{Solución Canónica Oficial:} Se crea una rejilla donde el elemento \texttt{.a} se expande horizontalmente abarcando las dos primeras columnas (\texttt{grid-column-start: 1; grid-column-end: 3;}), y los elementos restantes se ubican secuencialmente en las filas inferiores.
+
+\begin{lstlisting}[language=css, caption={Solucion canonica al Ejercicio 3 de Grid.}]
+.grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-gap: 5px;
+    max-width: 300px;
+}
+
+.item {
+    color: white;
+    padding: 1em;
+    text-align: center;
+    font-weight: bold;
+}
+
+/* Posicionamiento explicito en pistas de cuadricula */
+.a {
+    background: blue;
+    grid-column-start: 1;
+    grid-column-end: 3; /* Ocupa las dos columnas superiores */
+}
+
+.b {
+    background: red;
+    grid-row-start: 2;
+}
+
+.c {
+    background: green;
+    grid-row-start: 2;
+}
+
+.d {
+    background: orange;
+    grid-column-start: 1;
+    grid-column-end: 3; /* Ocupa las dos columnas inferiores */
+}
+\end{lstlisting}
+\end{ejercicioresuelto}
+
+\newpage
+
+\subsection{Ejercicio 14 de Bootstrap Resuelto: Réplica de Portal Web}
+
+\begin{ejercicioresuelto}{Ejercicio 14 (Bootstrap): Portal Académico CodeURJC Responsivo}
+\textbf{Enunciado Oficial:} \textit{Replica la página web del ejercicio utilizando componentes Bootstrap 5, integrando la URL del logotipo oficial (\url{https://www.codeurjc.es/img/codeurjc_logo.jpg}) y personalizando los estilos de Bootstrap.}
+
+\textbf{Solución de Ingeniería:} Se implementa una página completa y funcional utilizando el sistema de navegación colapsable (\texttt{navbar}), rejilla responsiva de 12 columnas con tarjetas (\texttt{cards}), tabla estilizada y formulario de inscripción, demostrando la integración limpia de estilos personalizados sobre las clases de Bootstrap.
+
+\begin{lstlisting}[language=HTML, caption={codeurjc\_portal.html: Solución completa al Ejercicio 14 de Bootstrap.}]
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CodeURJC - Centro de Desarrollo y Formacion Web</title>
+    <!-- Bootstrap 5.3.3 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
+    <!-- Estilos de Personalizacion sobre Bootstrap -->
+    <style>
+        :root {
+            --bs-primary: #143462;
+            --bs-primary-rgb: 20, 52, 98;
+        }
+        .navbar-brand img {
+            height: 48px;
+            object-fit: contain;
+        }
+        .hero-banner {
+            background: linear-gradient(135deg, #143462 0%, #0e7490 100%);
+            color: white;
+            border-radius: 12px;
+        }
+        .card-custom {
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border: 1px solid rgba(0, 0, 0, 0.08);
+        }
+        .card-custom:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+        }
+    </style>
+</head>
+<body class="bg-light">
+
+    <!-- 1. Barra de Navegacion Responsiva -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow-sm">
+        <div class="container">
+            <a class="navbar-brand d-flex align-items-center gap-2" href="#">
+                <img src="https://www.codeurjc.es/img/codeurjc_logo.jpg" alt="Logotipo Oficial CodeURJC" class="rounded bg-white p-1">
+                <span class="fw-bold tracking-wide">CodeURJC</span>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navMenu" aria-controls="navMenu" aria-expanded="false" aria-label="Abrir navegacion">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navMenu">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item"><a class="nav-link active" href="#"><i class="bi bi-house-door me-1"></i>Inicio</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#cursos"><i class="bi bi-journal-code me-1"></i>Cursos</a></li>
+                    <li class="nav-item"><a class="nav-link" href="#talleres"><i class="bi bi-calendar-event me-1"></i>Talleres</a></li>
+                    <li class="nav-item"><a class="nav-link btn btn-primary text-white ms-lg-3 px-3" href="#registro">Inscribirse</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- 2. Hero Banner Introductorio -->
+    <header class="container my-4">
+        <div class="hero-banner p-5 text-center shadow">
+            <h1 class="display-5 fw-bold">Aprende Ingenieria Web en CodeURJC</h1>
+            <p class="lead col-lg-8 mx-auto mt-3">
+                Formacion de vanguardia en tecnologías de cliente y servidor: HTML5 semántico, CSS3 avanzado, Bootstrap 5 y arquitecturas web de alto rendimiento.
+            </p>
+            <div class="mt-4">
+                <a href="#cursos" class="btn btn-warning btn-lg fw-semibold px-4 me-2">Ver Catalogo</a>
+                <a href="#registro" class="btn btn-outline-light btn-lg px-4">Crear Cuenta</a>
+            </div>
+        </div>
+    </header>
+
+    <!-- 3. Seccion de Tarjetas con Sistema Grid de 12 Columnas -->
+    <section class="container my-5" id="cursos">
+        <div class="text-center mb-4">
+            <h2 class="fw-bold text-dark">Modulos Formativos Destacados</h2>
+            <p class="text-muted">Desarrolla competencias reales de la industria del software.</p>
+        </div>
+
+        <div class="row g-4">
+            <!-- Tarjeta 1: HTML5 y Accesibilidad -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 card-custom shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge bg-primary p-2 me-2"><i class="bi bi-filetype-html fs-4"></i></span>
+                            <h5 class="card-title fw-bold mb-0">HTML5 Semantico</h5>
+                        </div>
+                        <p class="card-text text-secondary">Aprende a estructurar documentos limpios, accesibles para lectores de pantalla y optimizados para SEO.</p>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-success" style="width: 100%;"></div>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-outline-primary w-100">Acceder al Temario</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 2: CSS3 y Maquetacion Avanzada -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 card-custom shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge bg-info text-white p-2 me-2"><i class="bi bi-filetype-css fs-4"></i></span>
+                            <h5 class="card-title fw-bold mb-0">CSS3, Flexbox & Grid</h5>
+                        </div>
+                        <p class="card-text text-secondary">Domina el modelo de caja, cascada, especificidad y las herramientas de maquetacion moderna responsiva.</p>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-info" style="width: 85%;"></div>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-outline-info w-100">Acceder al Temario</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tarjeta 3: Bootstrap 5 -->
+            <div class="col-12 col-md-6 col-lg-4">
+                <div class="card h-100 card-custom shadow-sm">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center mb-3">
+                            <span class="badge bg-warning text-dark p-2 me-2"><i class="bi bi-bootstrap-fill fs-4"></i></span>
+                            <h5 class="card-title fw-bold mb-0">Bootstrap 5.3</h5>
+                        </div>
+                        <p class="card-text text-secondary">Construye interfaces agiles y adaptables con la cuadricula de 12 columnas y su catalogo de componentes UI.</p>
+                        <div class="progress mb-3" style="height: 8px;">
+                            <div class="progress-bar bg-warning" style="width: 70%;"></div>
+                        </div>
+                        <a href="#" class="btn btn-sm btn-outline-warning w-100">Acceder al Temario</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 4. Seccion de Tabla Responsiva de Horarios -->
+    <section class="container my-5" id="talleres">
+        <div class="card shadow-sm border-0">
+            <div class="card-header bg-dark text-white py-3">
+                <h4 class="mb-0 fw-bold"><i class="bi bi-table me-2"></i>Calendario de Talleres Practicos</h4>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover mb-0 align-middle">
+                        <thead class="table-secondary">
+                            <tr>
+                                <th>Codigo</th>
+                                <th>Taller</th>
+                                <th>Laboratorio</th>
+                                <th>Fecha</th>
+                                <th>Estado</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>TL-101</strong></td>
+                                <td>Maquetacion de Landing Pages con Grid</td>
+                                <td>Lab III - Aula 204 (Mostoles)</td>
+                                <td>Viernes, 16:00</td>
+                                <td><span class="badge bg-success">Plazas Disponibles</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>TL-102</strong></td>
+                                <td>Disenio de Componentes con Bootstrap 5</td>
+                                <td>Lab II - Aula 102 (Fuenlabrada)</td>
+                                <td>Lunes, 18:30</td>
+                                <td><span class="badge bg-warning text-dark">Ultimas Plazas</span></td>
+                            </tr>
+                            <tr>
+                                <td><strong>TL-103</strong></td>
+                                <td>Integracion de APIs REST y JSON</td>
+                                <td>Online (Teams)</td>
+                                <td>Miercoles, 17:00</td>
+                                <td><span class="badge bg-secondary">Completo</span></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 5. Formulario de Inscripcion Estilizado -->
+    <section class="container my-5" id="registro">
+        <div class="row justify-content-center">
+            <div class="col-12 col-md-8 col-lg-6">
+                <div class="card shadow border-0 p-4">
+                    <h3 class="fw-bold text-center mb-3">Inscripcion a CodeURJC</h3>
+                    <p class="text-muted text-center mb-4">Completa el formulario para reservar tu plaza en los talleres.</p>
+                    
+                    <form>
+                        <div class="mb-3">
+                            <label for="nombreCompleto" class="form-label fw-semibold">Nombre y Apellidos:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-person"></i></span>
+                                <input type="text" class="form-control" id="nombreCompleto" placeholder="David Sebastian" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="emailAlu" class="form-label fw-semibold">Correo Institucional URJC:</label>
+                            <div class="input-group">
+                                <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                                <input type="email" class="form-control" id="emailAlu" placeholder="d.sticea@alumnos.urjc.es" required>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="tallerSel" class="form-label fw-semibold">Seleccionar Taller:</label>
+                            <select class="form-select" id="tallerSel" required>
+                                <option value="" selected disabled>Elige una opcion...</option>
+                                <option value="1">TL-101: Maquetacion con Grid</option>
+                                <option value="2">TL-102: Bootstrap 5 Practico</option>
+                            </select>
+                        </div>
+
+                        <div class="form-check mb-4">
+                            <input class="form-check-input" type="checkbox" id="aceptoTerminos" required>
+                            <label class="form-check-label text-secondary" for="aceptoTerminos">
+                                Acepto la politica de tratamiento de datos personales de la URJC.
+                            </label>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary w-100 py-2 fw-semibold">Confirmar Matricula</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- 6. Pie de Pagina Corporativo -->
+    <footer class="bg-dark text-white py-4 mt-5">
+        <div class="container text-center">
+            <p class="mb-1">&copy; 2026 CodeURJC - Escuela Tecnica Superior de Ingenieria Informatica.</p>
+            <p class="text-secondary small mb-0">Desarrollado para la materia Fundamentos de la Web.</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap 5 Bundle JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+\end{lstlisting}
+\end{ejercicioresuelto}
