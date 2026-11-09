@@ -27,5 +27,3 @@
 .DS_Store
 Thumbs.db
 
-# (Opcional) Si prefieres que el PDF final no se guarde en Git:
-# *.pdf
